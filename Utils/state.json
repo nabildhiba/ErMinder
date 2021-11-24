@@ -1,0 +1,50 @@
+[
+  {"key": "null", "value": null, "label": "Select State"},
+  {
+    "key": "Andaman",
+    "value": "Andaman and Nicobar Islands",
+    "label": "Andaman and Nicobar Islands"
+  },
+  {"key": "Andhra", "value": "Andhra Pradesh", "label": "Andhra Pradesh"},
+  {
+    "key": "Arunachal",
+    "value": "Arunachal Pradesh",
+    "label": "Arunachal Pradesh"
+  },
+  {"key": "Assam", "value": "Assam", "label": "Assam"},
+  {"key": "Bihar", "value": "Bihar", "label": "Bihar"},
+  {"key": "Chandigarh", "value": "Chandigarh", "label": "Chandigarh"},
+  {"key": "Chhattisgarh", "value": "Chhattisgarh", "label": "Chhattisgarh"},
+  {
+    "key": "Dadra",
+    "value": "Dadra and Nagar Haveli",
+    "label": "Dadra and Nagar Haveli"
+  },
+  {"key": "Daman", "value": "Daman and Diu", "label": "Daman and Diu"},
+  {"key": "Delhi", "value": "Delhi", "label": "Delhi"},
+  {"key": "Goa", "value": "Goa", "label": "Goa"},
+  {"key": "Gujarat", "value": "Gujarat", "label": "Gujarat"},
+  {"key": "Haryana", "value": "Haryana", "label": "Haryana"},
+  {"key": "Himachal", "value": "Himachal Pradesh", "label": "Himachal Pradesh"},
+  {"key": "Jammu", "value": "Jammu and Kashmir", "label": "Jammu and Kashmir"},
+  {"key": "Jharkhand", "value": "Jharkhand", "label": "Jharkhand"},
+  {"key": "Karnataka", "value": "Karnataka", "label": "Karnataka"},
+  {"key": "Kerala", "value": "Kerala", "label": "Kerala"},
+  {"key": "Lakshadweep", "value": "Lakshadweep", "label": "Lakshadweep"},
+  {"key": "Madhya", "value": "Madhya Pradesh", "label": "Madhya Pradesh"},
+  {"key": "Maharashtra", "value": "Maharashtra", "label": "Maharashtra"},
+  {"key": "Manipur", "value": "Manipur", "label": "Manipur"},
+  {"key": "Meghalaya", "value": "Meghalaya", "label": "Meghalaya"},
+  {"key": "Mizoram", "value": "Mizoram", "label": "Mizoram"},
+  {"key": "Nagaland", "value": "Nagaland", "label": "Nagaland"},
+  {"key": "Orissa", "value": "Orissa", "label": "Orissa"},
+  {"key": "Pondicherry", "value": "Pondicherry", "label": "Pondicherry"},
+  {"key": "Punjab", "value": "Punjab", "label": "Punjab"},
+  {"key": "Rajasthan", "value": "Rajasthan", "label": "Rajasthan"},
+  {"key": "Sikkim", "value": "Sikkim", "label": "Sikkim"},
+  {"key": "Tamil", "value": "Tamil", "label": "Tamil Nadu"},
+  {"key": "Tripura", "value": "Tripura", "label": "Tripura"},
+  {"key": "Uttaranchal", "value": "Uttaranchal", "label": "Uttaranchal"},
+  {"key": "Uttar", "value": "Uttar Pradesh", "label": "Uttar Pradesh"},
+  {"key": "West", "value": "West Bengal", "label": "West Bengal"}
+]

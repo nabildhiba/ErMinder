@@ -1,0 +1,11 @@
+{
+  "primary": "#3e95be",
+  "backgroundColor": "#fff",
+  "sec_Primary": "#2ca29e",
+  "secondary": "#ebf6f6",
+  "text": "#000",
+  "textSecondary": "#AFAFBD",
+  "gray": "gray",
+  "white": "#fff",
+  "transparentGray": "#808080db"
+}
