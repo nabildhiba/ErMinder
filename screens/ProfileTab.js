@@ -13,7 +13,7 @@ const InfoRow = ({placeholder, value}) => {
   );
 };
 
-function AlarmTab({navigation}) {
+function ProfileTab({navigation}) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.cover}>
@@ -87,4 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AlarmTab;
+export default ProfileTab;
