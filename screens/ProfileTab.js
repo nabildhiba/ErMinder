@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, View, ScrollView, Image} from 'react-native';
 import {Text} from '../components/Text';
+import auth from '@react-native-firebase/auth';
 
 const PIC_SIZE = 130;
 
@@ -14,6 +15,14 @@ const InfoRow = ({placeholder, value}) => {
 };
 
 function ProfileTab({navigation}) {
+  const [user, setUser] = useState({});
+  useEffect(() => {
+    const currentUser = auth().currentUser;
+    if (currentUser) {
+      setUser(currentUser);
+    }
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.cover}>
@@ -33,7 +42,7 @@ function ProfileTab({navigation}) {
       </View>
       <View style={styles.infoContainer}>
         <InfoRow placeholder="Username" value="Justin" />
-        <InfoRow placeholder="Email" value="justin@gmail.com" />
+        <InfoRow placeholder="Email" value={user?.email ?? '-'} />
         <InfoRow placeholder="Location" value="Delhi (NCR)" />
         <InfoRow placeholder="Phone number" value="+91-8888881548" />
         <InfoRow placeholder="Password" value="************" />

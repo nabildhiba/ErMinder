@@ -1,11 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Dimensions,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
-  Platform,
-  ScrollView,
   View,
   Image,
   ImageBackground,
@@ -21,10 +18,10 @@ import IIcon from 'react-native-vector-icons/Ionicons';
 import FIcon from 'react-native-vector-icons/Fontisto';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EIcon from 'react-native-vector-icons/Entypo';
-import {axiosApi} from '../api/axiosApi';
 import {showMessage} from 'react-native-flash-message';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {CommonActions} from '@react-navigation/routers';
+import auth from '@react-native-firebase/auth';
 
 const {height, width} = Dimensions.get('screen');
 
@@ -38,90 +35,114 @@ function Login({navigation}) {
   const emailRegx =
     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
+  // const [email, setEmail] = useState(null);
+  // const [password, setPassword] = useState(null);
   const [isVerificationCode, setIsVerificationCode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // Set an initializing state whilst Firebase connects
+  const [initializing, setInitializing] = useState(true);
+  // const [user, setUser] = useState();
+
+  // Handle user state changes
+  function onAuthStateChanged(user) {
+    // console.log(user);
+    // setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async data => {
-    setEmail(data.user_name);
+    console.log(data);
     setIsLoading(true);
-    let res = await axiosApi({query: data, action: 'userLogin'}).catch(err => {
-      console.log(err);
-      setIsLoading(false);
-    });
-    if (res?.data?.ResponseMsg === 200) {
-      await EncryptedStorage.setItem(
-        'userData',
-        JSON.stringify(res?.data?.user_id),
-      ).catch(err => {
+    auth()
+      .signInWithEmailAndPassword(data.user_name, data.user_password)
+      .then(() => {
         setIsLoading(false);
-        console.log(err);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [{name: 'HomeNavigation'}],
+          }),
+        );
+      })
+      .catch(error => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorMessage);
         showMessage({
-          message: err
-            ? err?.message
-              ? err?.message?.toString()
-              : 'Something went wrong'
-            : 'Something went wrong',
+          message: errorMessage,
           type: 'danger',
         });
       });
-      setIsLoading(false);
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 1,
-          routes: [{name: 'HomeNavigation'}],
-        }),
-      );
-    } else if (res?.data?.ResponseMsg === 3001) {
-      showMessage({
-        message: 'Please Enter valid Email or Password',
-        type: 'danger',
-      });
-      setIsLoading(false);
-    } else if (res?.data?.ResponseMsg === 3002) {
-      showMessage({
-        message: 'Please verify your Email to continue',
-        type: 'danger',
-      });
-      setIsLoading(false);
-      setIsVerificationCode(true);
-    } else {
-      setIsLoading(false);
-    }
+    // setEmail(data.user_name);
+    // setIsLoading(true);
+    // auth()
+    //   .createUserWithEmailAndPassword('honey@gmail.com', 'Honey@123')
+    //   .then(() => {
+    //     console.log('User account created & signed in!');
+    //   })
+    //   .catch(error => {
+    //     if (error.code === 'auth/email-already-in-use') {
+    //       console.log('That email address is already in use!');
+    //     }
 
-    console.log(JSON.stringify(res));
+    //     if (error.code === 'auth/invalid-email') {
+    //       console.log('That email address is invalid!');
+    //     }
+
+    //     console.error(error);
+    //   });
+    // setIsLoading(false);
+    // let res = await axiosApi({query: data, action: 'userLogin'}).catch(err => {
+    //   console.log(err);
+    //   setIsLoading(false);
+    // });
+    // if (res?.data?.ResponseMsg === 200) {
+    //   await EncryptedStorage.setItem(
+    //     'userData',
+    //     JSON.stringify(res?.data?.user_id),
+    //   ).catch(err => {
+    //     setIsLoading(false);
+    //     console.log(err);
+    //     showMessage({
+    //       message: err
+    //         ? err?.message
+    //           ? err?.message?.toString()
+    //           : 'Something went wrong'
+    //         : 'Something went wrong',
+    //       type: 'danger',
+    //     });
+    //   });
+    //   setIsLoading(false);
+    //   navigation.dispatch(
+    //     CommonActions.reset({
+    //       index: 1,
+    //       routes: [{name: 'HomeNavigation'}],
+    //     }),
+    //   );
+    // } else if (res?.data?.ResponseMsg === 3001) {
+    //   showMessage({
+    //     message: 'Please Enter valid Email or Password',
+    //     type: 'danger',
+    //   });
+    //   setIsLoading(false);
+    // } else if (res?.data?.ResponseMsg === 3002) {
+    //   showMessage({
+    //     message: 'Please verify your Email to continue',
+    //     type: 'danger',
+    //   });
+    //   setIsLoading(false);
+    //   setIsVerificationCode(true);
+    // } else {
+    //   setIsLoading(false);
+    // }
   };
 
-  const resendCode = async () => {
-    let res = await axiosApi({
-      query: {email},
-      action: 'resendVerificationLink',
-    }).catch(err => {
-      console.log(err);
-      showMessage({
-        message: err
-          ? err?.message
-            ? err?.message?.toString()
-            : 'Something went wrong'
-          : 'Something went wrong',
-        type: 'danger',
-      });
-    });
-    console.log(JSON.stringify(res));
-    if (res?.data?.ResponseMsg === 200) {
-      setIsVerificationCode(false);
-      showMessage({
-        message: 'Verification code sent to your Email',
-        type: 'success',
-      });
-    } else {
-      showMessage({
-        message: 'Something went wrong, Please try again',
-        type: 'danger',
-      });
-    }
-  };
   return (
     <View
       style={{
@@ -205,11 +226,6 @@ function Login({navigation}) {
         <Text style={styles.error}>This is required.</Text>
       )}
       <View style={styles.checkboxContainer}>
-        {isVerificationCode && (
-          <Text style={styles.resendCode} onPress={resendCode}>
-            Send Verification Code
-          </Text>
-        )}
         <Text
           style={{
             position: 'absolute',
@@ -263,9 +279,10 @@ function Login({navigation}) {
           <MCIcon name="facebook" size={40} color={'#3b5998'} />
           <EIcon name="twitter-with-circle" size={40} color={'#1DA1F2'} />
         </View>
-        <TouchableOpacity onPress={()=>{
-          navigation.navigate('HomeNavigation')
-        }}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('HomeNavigation');
+          }}>
           <Text style={{fontSize: fontSize.normal}}>No account? Sign up</Text>
         </TouchableOpacity>
         <Button

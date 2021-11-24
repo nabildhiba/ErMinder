@@ -16,6 +16,7 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import {CommonActions} from '@react-navigation/routers';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {showMessage} from 'react-native-flash-message';
+import auth from '@react-native-firebase/auth';
 
 const NumberCard = ({text, number}) => {
   return (
@@ -83,13 +84,7 @@ function More({navigation}) {
   const [imageUrl, setImageUrl] = useState('');
 
   const logOut = async () => {
-    await EncryptedStorage.removeItem('userData').catch(err => {
-      console.log(err);
-      showMessage({
-        message: 'Something went wrong, Please try again',
-        type: 'danger',
-      });
-    });
+    auth().signOut();
     navigation.dispatch(
       CommonActions.reset({
         index: 1,

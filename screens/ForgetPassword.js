@@ -1,13 +1,5 @@
 import React, {useState} from 'react';
-import {
-  Dimensions,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Platform,
-  ScrollView,
-  View,
-} from 'react-native';
+import {Dimensions, StyleSheet, ScrollView, View} from 'react-native';
 import {useForm} from 'react-hook-form';
 
 import colors from '../constant/colors.json';
@@ -16,10 +8,9 @@ import Button from '../components/Button';
 import {Text} from '../components/Text';
 import CTextInput from '../components/CTextInput';
 import IIcon from 'react-native-vector-icons/Ionicons';
-import {axiosApi} from '../api/axiosApi';
 import {showMessage} from 'react-native-flash-message';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import {CommonActions} from '@react-navigation/routers';
+import auth from '@react-native-firebase/auth';
 
 const {height, width} = Dimensions.get('screen');
 
@@ -30,43 +21,32 @@ function ForgetPassword({navigation}) {
     formState: {errors},
   } = useForm();
 
-  const emailRegx =
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [isVerificationCode, setIsVerificationCode] = useState(false);
+  // TODO: use it wherever neeeded
+  // const emailRegx =
+  //   /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async data => {
-    setEmail(data.user_name);
+    console.log(data);
     setIsLoading(true);
-    let res = await axiosApi({query: data, action: 'forgotpassword'}).catch(
-      err => {
-        console.log(err);
+    auth()
+      .sendPasswordResetEmail(data.user_email)
+      .then(() => {
+        showMessage({
+          message: 'An email reset link have been sent to your email.',
+          type: 'success',
+        });
         setIsLoading(false);
-      },
-    );
-    console.log(JSON.stringify(res));
-    if (res?.data?.ResponseMsg === 200) {
-      showMessage({
-        message:
-          'Password Reset Request has successfully sent. You will receive email with reset password link, if you do not find email in inbox then please check spam/junk folder.',
-        type: 'success',
+        navigation.goBack();
+      })
+      .catch(error => {
+        setIsLoading(false);
+        const errorMessage = error.message;
+        showMessage({
+          message: errorMessage,
+          type: 'danger',
+        });
       });
-      setIsLoading(false);
-      navigation.goBack();
-    } else if (res?.data?.ResponseMsg === 3001) {
-      showMessage({
-        message: 'Entered email is either no registered or invalid',
-        type: 'danger',
-      });
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
-    }
-
-    console.log(JSON.stringify(res));
   };
 
   return (
@@ -124,9 +104,9 @@ function ForgetPassword({navigation}) {
             icon={
               <IIcon name="person-outline" size={20} color={colors.primary} />
             }
-            name="user_name"
+            name="user_email"
           />
-          {errors.user_name && (
+          {errors.user_email && (
             <Text style={styles.error}>This is required.</Text>
           )}
 
@@ -140,7 +120,8 @@ function ForgetPassword({navigation}) {
                 paddingVertical: 15,
               }}
               onPress={handleSubmit(onSubmit)}
-              isLoading={isLoading}></Button>
+              isLoading={isLoading}
+            />
           </View>
 
           <View
@@ -149,9 +130,8 @@ function ForgetPassword({navigation}) {
               bottom: 15,
               alignItems: 'center',
               alignSelf: 'center',
-            }}>
-            <View></View>
-          </View>
+            }}
+          />
         </View>
       </View>
     </ScrollView>
