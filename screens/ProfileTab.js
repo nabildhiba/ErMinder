@@ -1,8 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View, ScrollView, Image} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import {Text} from '../components/Text';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 const PIC_SIZE = 130;
 
@@ -24,6 +31,23 @@ function ProfileTab({navigation}) {
     }
   }, []);
 
+  const getProfilePhoto = async () => {
+    const result = await launchImageLibrary();
+    if (!result?.didCancel && result?.assets[0]?.uri) {
+      let reference = storage().ref(result?.assets[0]?.fileName);
+      let task = reference.putFile(result?.assets[0]?.uri);
+      task.then(async res => {
+        // TODO: need to delete the previous image somehow
+        // if (user?.photoURL) {
+        //   await storage().ref(user?.photoURL).delete();
+        // }
+        const url = await storage().ref(res.metadata.fullPath).getDownloadURL();
+        setUser(prev => ({...prev, photoURL: url}));
+        auth().currentUser.updateProfile({photoURL: url});
+      });
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.cover}>
@@ -35,10 +59,22 @@ function ProfileTab({navigation}) {
             },
           ]}>
           <Image
-            style={{width: PIC_SIZE, height: PIC_SIZE}}
-            source={require('../assets/profile.png')}
+            style={{
+              width: PIC_SIZE,
+              height: PIC_SIZE,
+              borderRadius: PIC_SIZE / 2,
+            }}
+            source={
+              user?.photoURL
+                ? {uri: user?.photoURL}
+                : require('../assets/profile.png')
+            }
           />
-          <Text style={styles.uploadText}>Upload</Text>
+          {user?.email && (
+            <TouchableOpacity onPress={getProfilePhoto}>
+              <Text style={styles.uploadText}>Upload</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <View style={styles.infoContainer}>
