@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, View, ScrollView, Image} from 'react-native';
 import {Text} from '../components/Text';
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
 
 const PIC_SIZE = 130;
 
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
   cover: {
     height: 140,
     marginBottom: 80,
-    backgroundColor: 'skyblue',
+    backgroundColor: '#309FA4',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   uploadText: {
-    color: 'skyblue',
+    color: '#309FA4',
     fontSize: 17,
     fontWeight: '600',
     marginTop: 2,

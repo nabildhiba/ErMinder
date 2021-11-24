@@ -65,7 +65,7 @@ export default function TabBar({state, descriptors, navigation}) {
           <IIcon
             name={'ios-location'}
             size={20}
-            color={isFocused ? colors.white : colors.gray}
+            color={isFocused ? colors.skyblue : colors.gray}
           />
         );
       case 'SettingTab':
@@ -73,7 +73,7 @@ export default function TabBar({state, descriptors, navigation}) {
           <IIcon
             name={'ios-settings'}
             size={20}
-            color={isFocused ? colors.white : colors.gray}
+            color={isFocused ? colors.skyblue : colors.gray}
           />
         );
       case 'AlarmTab':
@@ -81,18 +81,18 @@ export default function TabBar({state, descriptors, navigation}) {
           <IIcon
             name={'ios-alarm-outline'}
             size={20}
-            color={isFocused ? colors.white : colors.gray}
+            color={isFocused ? colors.skyblue : colors.gray}
           />
         );
 
-        case 'LogOutTab':
-          return (
-            <IIcon
-              name={'ios-power'}
-              size={20}
-              color={isFocused ? colors.white : colors.gray}
-            />
-          );
+      case 'LogOutTab':
+        return (
+          <IIcon
+            name={'ios-power'}
+            size={20}
+            color={isFocused ? colors.skyblue : colors.gray}
+          />
+        );
       default:
         return null;
     }

@@ -12,7 +12,7 @@ const AlarmCard = () => {
         <Text style={styles.bigText}>Maa kali temple</Text>
         <Switch
           trackColor={{false: '#767577', true: 'white'}}
-          thumbColor={isEnabled ? 'green' : 'green'}
+          thumbColor={isEnabled ? '#329EA8' : '#329EA8'}
           ios_backgroundColor="#3e3e3e"
           onValueChange={toggleSwitch}
           value={isEnabled}
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
   alramCard: {
     flex: 1,
-    backgroundColor: 'red',
+    backgroundColor: '#319EA7',
     borderRadius: 8,
     padding: 15,
     marginVertical: 10,
