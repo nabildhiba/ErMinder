@@ -22,6 +22,7 @@ import FlashMessage from 'react-native-flash-message';
 import Login from './screens/Login';
 import More from './screens/More';
 import AlarmTab from './screens/AlarmTab';
+import ProfileTab from './screens/ProfileTab';
 import {MoreStackHeader} from './components/MoreStackHeader';
 import Profile from './screens/Profile';
 import QuestionDetails from './screens/QuestionDetails';
@@ -92,7 +93,7 @@ const HomeNavigation = () => (
       }}
       component={AlarmTab}
     />
-    <Tab.Screen name="SettingTab" component={MoreStack} />
+    <Tab.Screen name="SettingTab" component={ProfileTab} />
     <Tab.Screen name="LogOutTab" component={MoreStack} />
   </Tab.Navigator>
 );
