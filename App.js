@@ -21,7 +21,7 @@ import {SettingStackHeader} from './components/SettingStackHeader';
 import FlashMessage from 'react-native-flash-message';
 import Login from './screens/Login';
 import More from './screens/More';
-import AlarmTab from './screens/AskQues';
+import AlarmTab from './screens/AlarmTab';
 import {MoreStackHeader} from './components/MoreStackHeader';
 import Profile from './screens/Profile';
 import QuestionDetails from './screens/QuestionDetails';
