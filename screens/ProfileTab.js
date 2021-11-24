@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
-import {StyleSheet, View, ScrollView, Switch, Image} from 'react-native';
+import React from 'react';
+import {StyleSheet, View, ScrollView, Image} from 'react-native';
 import {Text} from '../components/Text';
+
+const PIC_SIZE = 130;
 
 const InfoRow = ({placeholder, value}) => {
   return (
@@ -14,17 +16,16 @@ const InfoRow = ({placeholder, value}) => {
 function AlarmTab({navigation}) {
   return (
     <ScrollView style={styles.container}>
-      <View
-        style={{
-          height: 140,
-          marginBottom: 80,
-          backgroundColor: 'skyblue',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}>
-        <View style={{transform: [{translateY: 60}], alignItems: 'center'}}>
+      <View style={styles.cover}>
+        <View
+          style={[
+            styles.imgContainer,
+            {
+              transform: [{translateY: PIC_SIZE / 2}],
+            },
+          ]}>
           <Image
-            style={{width: 120, height: 120}}
+            style={{width: PIC_SIZE, height: PIC_SIZE}}
             source={require('../assets/profile.png')}
           />
           <Text style={styles.uploadText}>Upload</Text>
@@ -56,6 +57,16 @@ const styles = StyleSheet.create({
   infoContainer: {
     padding: 20,
   },
+  imgContainer: {
+    alignItems: 'center',
+  },
+  cover: {
+    height: 140,
+    marginBottom: 80,
+    backgroundColor: 'skyblue',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -72,6 +83,7 @@ const styles = StyleSheet.create({
     color: 'skyblue',
     fontSize: 17,
     fontWeight: '600',
+    marginTop: 2,
   },
 });
 
