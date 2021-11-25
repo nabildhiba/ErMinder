@@ -18,7 +18,6 @@ import CTextInput, {CPicker} from '../components/CTextInput';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import FIcon from 'react-native-vector-icons/FontAwesome';
 import F5Icon from 'react-native-vector-icons/FontAwesome5';
-import {axiosApi} from '../api/axiosApi';
 import {showMessage} from 'react-native-flash-message';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {CommonActions} from '@react-navigation/routers';
@@ -42,38 +41,39 @@ function Login({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async data => {
-    setIsLoading(true);
-    let res = await axiosApi({query: data, action: 'userRegister'}).catch(
-      err => {
-        console.log(err);
-        setIsLoading(false);
-        showMessage({
-          message: err
-            ? err?.message
-              ? err?.message?.toString()
-              : 'Something went wrong'
-            : 'Something went wrong',
-          type: 'danger',
-        });
-      },
-    );
-    console.log(JSON.stringify(res));
-    if (res?.data?.ResponseMsg === 200) {
-      setIsLoading(false);
-      showMessage({
-        message: 'Account Created, Please verify your email to continue',
-        type: 'success',
-      });
-      navigation.goBack();
-    } else if (res?.data?.ResponseMsg === 3001) {
-      showMessage({
-        message: 'Please Enter valid Email or Password',
-        type: 'danger',
-      });
-      setIsLoading(false);
-    }
+    console.log(data);
+    // setIsLoading(true);
+    // let res = await axiosApi({query: data, action: 'userRegister'}).catch(
+    //   err => {
+    //     console.log(err);
+    //     setIsLoading(false);
+    //     showMessage({
+    //       message: err
+    //         ? err?.message
+    //           ? err?.message?.toString()
+    //           : 'Something went wrong'
+    //         : 'Something went wrong',
+    //       type: 'danger',
+    //     });
+    //   },
+    // );
+    // console.log(JSON.stringify(res));
+    // if (res?.data?.ResponseMsg === 200) {
+    //   setIsLoading(false);
+    //   showMessage({
+    //     message: 'Account Created, Please verify your email to continue',
+    //     type: 'success',
+    //   });
+    //   navigation.goBack();
+    // } else if (res?.data?.ResponseMsg === 3001) {
+    //   showMessage({
+    //     message: 'Please Enter valid Email or Password',
+    //     type: 'danger',
+    //   });
+    //   setIsLoading(false);
+    // }
 
-    console.log(JSON.stringify(res));
+    // console.log(JSON.stringify(res));
   };
 
   return (

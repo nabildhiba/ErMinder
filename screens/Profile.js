@@ -8,7 +8,6 @@ import {Picker} from '@react-native-picker/picker';
 import Button from '../components/Button';
 import {Text} from '../components/Text';
 import {useEffect} from 'react';
-import {axiosApi, axiosApiPost} from '../api/axiosApi';
 import CMultiSelect from '../components/CMultiSelect';
 import states from '../Utils/state.json';
 import {showMessage} from 'react-native-flash-message';
@@ -40,117 +39,117 @@ function Profile({route, navigation}) {
   const [experienceErr, setExperienceErr] = useState(false);
   const [experience, setExperience] = useState([]);
 
-  const onSubmit = async data => {
-    if (
-      route?.params?.upgradeToExpert === true ||
-      userData.usertype === 'expert'
-    ) {
-      if (selectedExpert?.length === 0) {
-        setExpertErr(true);
-        return;
-      }
+  // const onSubmit = async data => {
+  //   if (
+  //     route?.params?.upgradeToExpert === true ||
+  //     userData.usertype === 'expert'
+  //   ) {
+  //     if (selectedExpert?.length === 0) {
+  //       setExpertErr(true);
+  //       return;
+  //     }
 
-      if (selectedExperience?.length === 0) {
-        setExperienceErr(true);
-        return;
-      }
-    }
-    setIsLoading(true);
-    console.log(data);
-    let res = await axiosApi({
-      query:
-        route?.params?.upgradeToExpert === true ||
-        userData.usertype === 'expert'
-          ? {
-              ...data,
-              userid: userData.id,
-              updatetoexpert: 1,
-              expertin: selectedExpert.join(),
-              qualification: selectedExperience.join(),
-            }
-          : {...data, userid: userData.id},
-      action: 'editmyPorfile',
-    }).catch(err => {
-      showMessage({
-        message: err
-          ? err?.message
-            ? err?.message?.toString()
-            : 'Something went wrong'
-          : 'Something went wrong',
-        type: 'danger',
-      });
-      console.log(err);
-      setIsLoading(false);
-    });
-    if (res?.data?.ResponseMsg === 200) {
-      setIsLoading(false);
-      if (route?.params?.upgradeToExpert === true) {
-        showMessage({
-          message: 'Request Submitted Successfully!',
-          type: 'success',
-        });
-      } else {
-        showMessage({
-          message: 'Profile Updated Successfully!',
-          type: 'success',
-        });
-      }
-      navigation.goBack();
-    } else {
-      showMessage({
-        message: 'Something went wrong, Please try again',
-        type: 'danger',
-      });
-      setIsLoading(false);
-    }
-    // console.log(JSON.stringify(res));
-  };
+  //     if (selectedExperience?.length === 0) {
+  //       setExperienceErr(true);
+  //       return;
+  //     }
+  //   }
+  //   setIsLoading(true);
+  //   console.log(data);
+  //   let res = await axiosApi({
+  //     query:
+  //       route?.params?.upgradeToExpert === true ||
+  //       userData.usertype === 'expert'
+  //         ? {
+  //             ...data,
+  //             userid: userData.id,
+  //             updatetoexpert: 1,
+  //             expertin: selectedExpert.join(),
+  //             qualification: selectedExperience.join(),
+  //           }
+  //         : {...data, userid: userData.id},
+  //     action: 'editmyPorfile',
+  //   }).catch(err => {
+  //     showMessage({
+  //       message: err
+  //         ? err?.message
+  //           ? err?.message?.toString()
+  //           : 'Something went wrong'
+  //         : 'Something went wrong',
+  //       type: 'danger',
+  //     });
+  //     console.log(err);
+  //     setIsLoading(false);
+  //   });
+  //   if (res?.data?.ResponseMsg === 200) {
+  //     setIsLoading(false);
+  //     if (route?.params?.upgradeToExpert === true) {
+  //       showMessage({
+  //         message: 'Request Submitted Successfully!',
+  //         type: 'success',
+  //       });
+  //     } else {
+  //       showMessage({
+  //         message: 'Profile Updated Successfully!',
+  //         type: 'success',
+  //       });
+  //     }
+  //     navigation.goBack();
+  //   } else {
+  //     showMessage({
+  //       message: 'Something went wrong, Please try again',
+  //       type: 'danger',
+  //     });
+  //     setIsLoading(false);
+  //   }
+  //   // console.log(JSON.stringify(res));
+  // };
 
-  const getCategories = async () => {
-    let res = await axiosApiPost({action: 'categories'}).catch(err => {
-      console.log(err);
-    });
-    if (res?.data?.ResponseMsg === 200) {
-      if (route?.params?.userData?.expert_in_id) {
-        let temp = route?.params?.userData?.expert_in_id?.split(',');
-        if (temp.length !== 0) {
-          console.log('inIF');
+  // const getCategories = async () => {
+  //   let res = await axiosApiPost({action: 'categories'}).catch(err => {
+  //     console.log(err);
+  //   });
+  //   if (res?.data?.ResponseMsg === 200) {
+  //     if (route?.params?.userData?.expert_in_id) {
+  //       let temp = route?.params?.userData?.expert_in_id?.split(',');
+  //       if (temp.length !== 0) {
+  //         console.log('inIF');
 
-          setCategories(
-            res?.data?.ResponseData?.map(item => {
-              if (temp.find(fitem => fitem == item.id) === undefined) {
-                return {id: item.id, name: item.category_name};
-              } else {
-                setSelectedExpert(prev => [...prev, item.id]);
-                return {id: item.id, name: item.category_name, checked: true};
-              }
-            }),
-          );
-        } else {
-          console.log('inElse');
-          setCategories(() =>
-            res?.data?.ResponseData?.map(item => ({
-              id: item.id,
-              name: item.category_name,
-            })),
-          );
-        }
-      } else {
-        console.log('inElse');
-        setCategories(() =>
-          res?.data?.ResponseData?.map(item => ({
-            id: item.id,
-            name: item.category_name,
-          })),
-        );
-      }
-    }
-    console.log('Categories------Res----', JSON.stringify(res));
-  };
+  //         setCategories(
+  //           res?.data?.ResponseData?.map(item => {
+  //             if (temp.find(fitem => fitem == item.id) === undefined) {
+  //               return {id: item.id, name: item.category_name};
+  //             } else {
+  //               setSelectedExpert(prev => [...prev, item.id]);
+  //               return {id: item.id, name: item.category_name, checked: true};
+  //             }
+  //           }),
+  //         );
+  //       } else {
+  //         console.log('inElse');
+  //         setCategories(() =>
+  //           res?.data?.ResponseData?.map(item => ({
+  //             id: item.id,
+  //             name: item.category_name,
+  //           })),
+  //         );
+  //       }
+  //     } else {
+  //       console.log('inElse');
+  //       setCategories(() =>
+  //         res?.data?.ResponseData?.map(item => ({
+  //           id: item.id,
+  //           name: item.category_name,
+  //         })),
+  //       );
+  //     }
+  //   }
+  //   console.log('Categories------Res----', JSON.stringify(res));
+  // };
 
-  useEffect(() => {
-    getCategories();
-  }, []);
+  // useEffect(() => {
+  //   getCategories();
+  // }, []);
 
   useLayoutEffect(() => {
     let experienceTemp = [

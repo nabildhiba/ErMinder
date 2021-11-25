@@ -281,7 +281,7 @@ function Login({navigation}) {
         </View>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('HomeNavigation');
+            navigation.navigate('SignUp');
           }}>
           <Text style={{fontSize: fontSize.normal}}>No account? Sign up</Text>
         </TouchableOpacity>

@@ -5,7 +5,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from './screens/Home';
-import SignUp from './screens/SignUp';
+import SignUp2 from './screens/SignUp2';
 
 import TabBar from './components/TabBar';
 import {TabNavHeader} from './components/TabNavHeader';
@@ -28,7 +28,7 @@ const LoginNavigation = () => (
     screenOptions={{header: () => null}}
     initialRouteName={'Login'}>
     <Stack.Screen name="Login" component={Login} />
-    <Stack.Screen name="SignUp" component={SignUp} />
+    <Stack.Screen name="SignUp" component={SignUp2} />
     <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
   </Stack.Navigator>
 );

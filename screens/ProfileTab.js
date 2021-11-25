@@ -5,13 +5,14 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import {Text} from '../components/Text';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import {launchImageLibrary} from 'react-native-image-picker';
 
-const PIC_SIZE = 130;
+const PIC_SIZE = 150;
 
 const InfoRow = ({placeholder, value}) => {
   return (
@@ -50,40 +51,43 @@ function ProfileTab({navigation}) {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.cover}>
-        <View
-          style={[
-            styles.imgContainer,
-            {
-              transform: [{translateY: PIC_SIZE / 2}],
-            },
-          ]}>
-          <Image
-            style={{
-              width: PIC_SIZE,
-              height: PIC_SIZE,
-              borderRadius: PIC_SIZE / 2,
-            }}
-            source={
-              user?.photoURL
-                ? {uri: user?.photoURL}
-                : require('../assets/profile.png')
-            }
-          />
-          {user?.email && (
-            <TouchableOpacity onPress={getProfilePhoto}>
-              <Text style={styles.uploadText}>Upload</Text>
-            </TouchableOpacity>
-          )}
+      <ImageBackground source={require('../assets/profileback.png')}>
+        <View style={{height: 160}} />
+        <View style={styles.cover}>
+          <View
+            style={[
+              styles.imgContainer,
+              {
+                transform: [{translateY: -PIC_SIZE / 2}],
+              },
+            ]}>
+            <Image
+              style={{
+                width: PIC_SIZE,
+                height: PIC_SIZE,
+                borderRadius: PIC_SIZE / 2,
+              }}
+              source={
+                user?.photoURL
+                  ? {uri: user?.photoURL}
+                  : require('../assets/profile.png')
+              }
+            />
+            {user?.email && (
+              <TouchableOpacity onPress={getProfilePhoto}>
+                <Text style={styles.uploadText}>Upload</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-      <View style={styles.infoContainer}>
-        <InfoRow placeholder="Username" value="Justin" />
-        <InfoRow placeholder="Email" value={user?.email ?? '-'} />
-        <InfoRow placeholder="Location" value="Delhi (NCR)" />
-        <InfoRow placeholder="Phone number" value="+91-8888881548" />
-        <InfoRow placeholder="Password" value="************" />
-      </View>
+        <View style={styles.infoContainer}>
+          <InfoRow placeholder="Username" value="Justin" />
+          <InfoRow placeholder="Email" value={user?.email ?? '-'} />
+          <InfoRow placeholder="Location" value="Delhi (NCR)" />
+          <InfoRow placeholder="Phone number" value="+91-8888881548" />
+          <InfoRow placeholder="Password" value="************" />
+        </View>
+      </ImageBackground>
     </ScrollView>
   );
 }
@@ -102,14 +106,14 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     padding: 20,
+    backgroundColor: '#FFF',
   },
   imgContainer: {
     alignItems: 'center',
+    marginBottom: -PIC_SIZE / 2 + 10,
   },
   cover: {
-    height: 140,
-    marginBottom: 80,
-    backgroundColor: '#309FA4',
+    backgroundColor: '#FFF',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
