@@ -24,9 +24,10 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import {Picker} from '@react-native-picker/picker';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {format} from 'date-fns';
+import {format, differenceInMinutes, formatDistanceToNow} from 'date-fns';
 import BackgroundTimer from 'react-native-background-timer';
 import {getLocation} from '../Utils/requestLocationPermission';
+import getDistanceFromLatLon from '../Utils/getDistanceFromLatLon';
 import notifee from '@notifee/react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -264,8 +265,15 @@ function Home({route, navigation}) {
   const [distanceCheckbox, setDistanceCheckbox] = useState(false);
   const [timeCheckbox, setTimeCheckbox] = useState(false);
   const [loading, setLoading] = useState(false);
+  const alarmRef = useRef([]);
+  const [region, setRegion] = useState({
+    latitude: 28,
+    longitude: 76,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
 
-  async function onDisplayNotification() {
+  async function onDisplayNotification(title, body) {
     // Create a channel
     const channelId = await notifee.createChannel({
       id: 'default',
@@ -274,8 +282,8 @@ function Home({route, navigation}) {
 
     // Display a notification
     await notifee.displayNotification({
-      title: 'Notification Title',
-      body: 'Main body content of the notification',
+      title,
+      body,
       android: {
         channelId,
         // smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
@@ -283,20 +291,94 @@ function Home({route, navigation}) {
     });
   }
 
+  const addDebugObject = object => {
+    // const debugCollection = firestore().collection('debug');
+    // debugCollection.add(object);
+  };
+
+  const performTask = async () => {
+    getLocation().then(async res => {
+      addDebugObject({
+        type: 'current location',
+        res,
+      });
+      setRegion({
+        latitude: res.coords.latitude,
+        longitude: res.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+      alarmRef.current.forEach(item => {
+        if (item.isActive && item.distanceAlarm) {
+          const distance = getDistanceFromLatLon(
+            res.coords.latitude,
+            res.coords.longitude,
+            item.coordinate.latitude,
+            item.coordinate.longitude,
+          );
+          console.log(distance);
+          addDebugObject({
+            type: 'distanceAlarm',
+            distance,
+          });
+          if (distance <= item.distance) {
+            if (auth()?.currentUser?.uid) {
+              firestore()
+                .collection('Users')
+                .doc(auth().currentUser.uid)
+                .collection('Alarms')
+                .doc(item.id)
+                .update({isActive: false});
+            }
+            onDisplayNotification(
+              item.location,
+              `You are ${distance.toFixed(2)} miles away from ${item.location}`,
+            );
+          }
+        }
+        if (item.isActive && item.timeAlarm) {
+          const distance = getDistanceFromLatLon(
+            res.coords.latitude,
+            res.coords.longitude,
+            item.coordinate.latitude,
+            item.coordinate.longitude,
+          );
+          const timeDifference = Math.abs(
+            differenceInMinutes(new Date(item.dateTime), new Date()),
+          );
+          console.log(4, timeDifference);
+          if (distance <= 2 && timeDifference <= 15) {
+            onDisplayNotification(
+              `Time alarm (${item.location}) - ${formatDistanceToNow(
+                new Date(item.dateTime),
+              )}`,
+              `2 You are ${distance.toFixed(2)} miles away from ${
+                item.location
+              }`,
+            );
+          }
+        }
+      });
+    });
+  };
+
   const onMapPress = e => {
-    onDisplayNotification();
     setMarker({
       coordinate: e.nativeEvent.coordinate,
     });
     rawSheetRef.current.open();
   };
 
-  const performTask = async () => {
-    getLocation().then(res => console.log(res));
-  };
-
   const onSubmit = () => {
     console.log(auth().currentUser.uid);
+    console.log(!(distanceCheckbox || timeCheckbox));
+    if (!(distanceCheckbox || timeCheckbox)) {
+      showMessage({
+        message: 'Please select atleast one option.',
+        type: 'danger',
+      });
+      return;
+    }
     if (auth()?.currentUser?.uid) {
       setLoading(true);
       const Alarms = firestore()
@@ -312,8 +394,13 @@ function Home({route, navigation}) {
         location: 'Delhi',
         distance: 2,
         notificationVia: notificationVia,
-        dateTime: `${format(date, 'yyyy-MM-dd')} ${format(time, 'HH:mm')}`,
+        dateTime: `${format(date, 'yyyy-MM-dd')}T${format(time, 'HH:mm:ss')}`,
+        dateTimeFormatted: `${format(date, 'dd/MM/yyyy')} ${format(
+          time,
+          'HH:mm',
+        )}`,
         isActive: true,
+        createdAt: firestore.Timestamp.fromDate(new Date()),
       })
         .then(() => {
           setLoading(false);
@@ -335,12 +422,50 @@ function Home({route, navigation}) {
   };
 
   useEffect(() => {
-    // BackgroundTimer.runBackgroundTimer(() => {
-    //   performTask();
-    // }, 20000);
-    // return () => {
-    //   BackgroundTimer.stopBackgroundTimer();
-    // };
+    BackgroundTimer.runBackgroundTimer(() => {
+      performTask();
+    }, 5000);
+    return () => {
+      BackgroundTimer.stopBackgroundTimer();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (auth()?.currentUser?.uid) {
+      // const allAlarms = [];
+      firestore()
+        .collection('Users')
+        .doc(auth().currentUser.uid)
+        .collection('Alarms')
+        .onSnapshot(doc => {
+          doc.docChanges().forEach(change => {
+            if (change.type === 'added') {
+              alarmRef.current = [
+                {...change.doc.data(), id: change.doc.id},
+                ...alarmRef.current,
+              ];
+            }
+            if (change.type === 'modified') {
+              alarmRef.current = alarmRef.current.map(item => {
+                if (item.id === change.doc.id) {
+                  return {...item, ...change.doc.data()};
+                } else {
+                  return item;
+                }
+              });
+            }
+            if (change.type === 'removed') {
+              alarmRef.current = alarmRef.current.filter(item => {
+                if (item.id === change.doc.id) {
+                  return false;
+                }
+                return true;
+              });
+            }
+          });
+        });
+    }
   }, []);
 
   return (
@@ -348,12 +473,13 @@ function Home({route, navigation}) {
       <MapView
         style={{flex: 1}}
         provider={PROVIDER_GOOGLE}
-        initialRegion={{
-          latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
+        region={region}
+        // initialRegion={{
+        //   latitude: 37.78825,
+        //   longitude: -122.4324,
+        //   latitudeDelta: 0.0922,
+        //   longitudeDelta: 0.0421,
+        // }}
         onPress={onMapPress}>
         {marker?.coordinate && <Marker coordinate={marker.coordinate} />}
       </MapView>

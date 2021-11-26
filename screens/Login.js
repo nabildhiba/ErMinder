@@ -71,7 +71,6 @@ function Login({navigation}) {
         );
       })
       .catch(error => {
-        const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage);
         showMessage({
@@ -285,7 +284,7 @@ function Login({navigation}) {
           }}>
           <Text style={{fontSize: fontSize.normal}}>No account? Sign up</Text>
         </TouchableOpacity>
-        <Button
+        {/* <Button
           text={'Continue without login'}
           textStyle={{color: colors.text, fontSize: fontSize.small}}
           style={{backgroundColor: '#fff', marginTop: 10}}
@@ -297,7 +296,7 @@ function Login({navigation}) {
               }),
             );
           }}
-        />
+        /> */}
       </View>
       {/* </View> */}
       {/* </View> */}

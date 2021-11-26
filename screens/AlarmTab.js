@@ -1,18 +1,39 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, ScrollView, Switch} from 'react-native';
+import {StyleSheet, View, Switch, FlatList} from 'react-native';
 import {Text} from '../components/Text';
+import NoData from '../components/NoData';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import LinearGradient from 'react-native-linear-gradient';
 
 const AlarmCard = ({data}) => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const [isEnabled, setIsEnabled] = useState(data.item.isActive);
+  const toggleSwitch = () => {
+    setIsEnabled(prev => !prev);
+    if (auth()?.currentUser?.uid) {
+      // const allAlarms = [];
+      firestore()
+        .collection('Users')
+        .doc(auth().currentUser.uid)
+        .collection('Alarms')
+        .doc(data.item.id)
+        .update({isActive: !isEnabled});
+    }
+  };
+
+  useEffect(() => {
+    setIsEnabled(data.item.isActive);
+  }, [data.item.isActive]);
+
+  console.log(data.item);
+  if (!data.item.timeAlarm && !data.item.distanceAlarm) {
+    return null;
+  }
 
   return (
     <LinearGradient colors={['#4292C5', '#1FAB86']} style={styles.alramCard}>
       <View style={styles.cardRow}>
-        <Text style={styles.bigText}>Maa kali temple</Text>
+        <Text style={styles.bigText}>{data.item.location}</Text>
         <Switch
           trackColor={{false: '#767577', true: 'white'}}
           thumbColor={isEnabled ? '#329EA8' : '#329EA8'}
@@ -22,14 +43,13 @@ const AlarmCard = ({data}) => {
           style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
         />
       </View>
-      <Text style={styles.text}>Maa kali temple</Text>
-      {data.distanceAlarm && (
+      {data.item.distanceAlarm && (
         <Text style={styles.text}>
-          Distance Alarm: {`${data.distance} miles`}
+          Distance Alarm: {`${data.item.distance} miles`}
         </Text>
       )}
-      {data.timeAlarm && (
-        <Text style={styles.text}>Time Alarm: {data.dateTime}</Text>
+      {data.item.timeAlarm && (
+        <Text style={styles.text}>Time Alarm: {data.item.dateTime}</Text>
       )}
     </LinearGradient>
   );
@@ -40,42 +60,84 @@ function AlarmTab({navigation}) {
 
   useEffect(() => {
     if (auth()?.currentUser?.uid) {
-      const allAlarms = [];
-      const Alarms = firestore()
+      // const allAlarms = [];
+      firestore()
         .collection('Users')
         .doc(auth().currentUser.uid)
-        .collection('Alarms');
-      Alarms.get().then(res => {
-        console.log(res);
-        res.forEach(result => {
-          console.log(result.data());
-          allAlarms.push(result.data());
+        .collection('Alarms')
+        .onSnapshot(doc => {
+          doc.docChanges().forEach(change => {
+            if (change.type === 'added') {
+              setAlarms(prev => [
+                {...change.doc.data(), id: change.doc.id},
+                ...prev,
+              ]);
+            }
+            if (change.type === 'modified') {
+              setAlarms(prev =>
+                prev.map(item => {
+                  if (item.id === change.doc.id) {
+                    return {...item, ...change.doc.data()};
+                  } else {
+                    return item;
+                  }
+                }),
+              );
+            }
+            if (change.type === 'removed') {
+              setAlarms(prev =>
+                prev.filter(item => {
+                  if (item.id === change.doc.id) {
+                    return false;
+                  }
+                  return true;
+                }),
+              );
+            }
+          });
         });
-        setAlarms(allAlarms);
-      });
+      // const Alarms = firestore()
+      //   .collection('Users')
+      //   .doc(auth().currentUser.uid)
+      //   .collection('Alarms');
+      // Alarms.get().then(res => {
+      //   console.log(res);
+      //   res.forEach(result => {
+      //     console.log(result.data());
+      //     allAlarms.push({...result.data(), key: result.id});
+      //   });
+      //   setAlarms(allAlarms);
+      // });
     }
   }, []);
 
   return (
-    <ScrollView style={styles.scrollView}>
-      {alarms.map(item => {
+    <View style={styles.container}>
+      {/* {alarms.map(item => {
         return <AlarmCard data={item} />;
-      })}
-    </ScrollView>
+      })} */}
+      {alarms.length === 0 && <NoData />}
+      <FlatList
+        data={alarms}
+        keyExtractor={item => item.id}
+        renderItem={item => <AlarmCard data={item} />}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
+  container: {
     backgroundColor: '#fff',
-    padding: 20,
+    flex: 1,
   },
   alramCard: {
     flex: 1,
     backgroundColor: '#319EA7',
     borderRadius: 8,
     padding: 15,
-    marginVertical: 10,
+    marginTop: 20,
+    marginHorizontal: 20,
   },
   cardRow: {
     flexDirection: 'row',

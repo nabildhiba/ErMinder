@@ -12,6 +12,7 @@ import FIcon from 'react-native-vector-icons/Fontisto';
 import {showMessage} from 'react-native-flash-message';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import auth from '@react-native-firebase/auth';
+import {CommonActions} from '@react-navigation/routers';
 
 const {height, width} = Dimensions.get('screen');
 
@@ -31,14 +32,19 @@ function ForgetPassword({navigation}) {
     console.log(data);
     setIsLoading(true);
     auth()
-      .sendPasswordResetEmail(data.user_email)
-      .then(() => {
+      .createUserWithEmailAndPassword(data.user_email, data.user_password)
+      .then(res => {
         showMessage({
-          message: 'An email reset link have been sent to your email.',
+          message: 'Your account has been created.',
           type: 'success',
         });
         setIsLoading(false);
-        navigation.goBack();
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [{name: 'HomeNavigation'}],
+          }),
+        );
       })
       .catch(error => {
         setIsLoading(false);
@@ -80,7 +86,7 @@ function ForgetPassword({navigation}) {
             color: '#fff',
             fontWeight: '500',
           }}>
-          Forgot Password
+          Sign Up
         </Text>
       </View>
       <View style={{flex: 1, paddingHorizontal: 10}}>
@@ -88,7 +94,7 @@ function ForgetPassword({navigation}) {
           style={{
             height: height - 270,
             minHeight: 250,
-            maxHeight: 450,
+            // maxHeight: 450,
             paddingTop: 10,
             paddingHorizontal: 15,
             borderRadius: 15,
@@ -108,21 +114,6 @@ function ForgetPassword({navigation}) {
             name="user_email"
           />
           {errors.user_email && (
-            <Text style={styles.error}>This is required.</Text>
-          )}
-
-          <CTextInput
-            autoFocus={true}
-            control={control}
-            rules={{
-              required: true,
-            }}
-            style={{width: '100%', minHeight: 55}}
-            placeholder={'Password'}
-            icon={<FIcon name="locked" size={20} color={colors.primary} />}
-            name="user_password"
-          />
-          {errors.user_password && (
             <Text style={styles.error}>This is required.</Text>
           )}
 
@@ -162,14 +153,29 @@ function ForgetPassword({navigation}) {
             <Text style={styles.error}>This is required.</Text>
           )}
 
-          <View style={{flex: 1, marginTop: 30}}>
+          <CTextInput
+            autoFocus={true}
+            control={control}
+            rules={{
+              required: true,
+            }}
+            style={{width: '100%', minHeight: 55}}
+            placeholder={'Password'}
+            icon={<FIcon name="locked" size={20} color={colors.primary} />}
+            name="user_password"
+          />
+          {errors.user_password && (
+            <Text style={styles.error}>This is required.</Text>
+          )}
+
+          <View style={{flex: 1, margin: 30}}>
             <Button
-              text={'Reset Password'}
+              text={'Submit'}
               style={{
                 backgroundColor: colors.primary,
                 borderRadius: 8,
                 marginTop: 8,
-                paddingVertical: 15,
+                paddingVertical: 10,
               }}
               onPress={handleSubmit(onSubmit)}
               isLoading={isLoading}
