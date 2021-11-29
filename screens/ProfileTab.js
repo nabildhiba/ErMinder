@@ -29,7 +29,12 @@ function ProfileTab({navigation}) {
   useEffect(() => {
     const currentUser = auth().currentUser;
     if (currentUser) {
-      setUser(currentUser);
+      setUser({
+        email: currentUser.email,
+        phone: currentUser.phoneNumber,
+        photoURL: currentUser.photoURL,
+        isAnonymous: currentUser.isAnonymous,
+      });
       firestore()
         .collection('Users')
         .doc(currentUser.uid)
@@ -57,7 +62,9 @@ function ProfileTab({navigation}) {
         //   await storage().ref(user?.photoURL).delete();
         // }
         const url = await storage().ref(res.metadata.fullPath).getDownloadURL();
-        setUser(prev => ({...prev, photoURL: url}));
+        setUser(prev => {
+          return {...prev, photoURL: url};
+        });
         auth().currentUser.updateProfile({photoURL: url});
       });
     }
@@ -87,7 +94,7 @@ function ProfileTab({navigation}) {
                   : require('../assets/profile.png')
               }
             />
-            {user?.email && (
+            {user && (
               <TouchableOpacity onPress={getProfilePhoto}>
                 <Text style={styles.uploadText}>Upload</Text>
               </TouchableOpacity>
@@ -96,9 +103,18 @@ function ProfileTab({navigation}) {
         </View>
         <View style={styles.infoContainer}>
           {/* <InfoRow placeholder="Username" value="Justin" /> */}
-          <InfoRow placeholder="Email" value={user?.email ?? '-'} />
-          <InfoRow placeholder="Location" value={user?.location ?? '-'} />
-          <InfoRow placeholder="Phone number" value={user?.phone ?? '-'} />
+          <InfoRow
+            placeholder="Email"
+            value={user?.isAnonymous ? 'Anonymous' : user?.email ?? '-'}
+          />
+          <InfoRow
+            placeholder="Location"
+            value={user?.isAnonymous ? 'Anonymous' : user?.location ?? '-'}
+          />
+          <InfoRow
+            placeholder="Phone number"
+            value={user?.isAnonymous ? 'Anonymous' : user?.phone ?? '-'}
+          />
           {/* <InfoRow placeholder="Password" value={user?.email ?? '-'} /> */}
         </View>
       </ImageBackground>

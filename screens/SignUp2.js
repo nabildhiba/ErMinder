@@ -104,9 +104,7 @@ function ForgetPassword({navigation}) {
       <View style={{flex: 1, paddingHorizontal: 10}}>
         <View
           style={{
-            height: height - 270,
             minHeight: 250,
-            // maxHeight: 450,
             paddingTop: 10,
             paddingHorizontal: 15,
             borderRadius: 15,
@@ -126,7 +124,7 @@ function ForgetPassword({navigation}) {
             name="user_email"
           />
           {errors.user_email && (
-            <Text style={styles.error}>This is required.</Text>
+            <Text style={styles.error}>Please enter your email.</Text>
           )}
 
           <CTextInput
@@ -147,7 +145,7 @@ function ForgetPassword({navigation}) {
             keyboardType="phone-pad"
           />
           {errors.user_phone && (
-            <Text style={styles.error}>This is required.</Text>
+            <Text style={styles.error}>Please enter your phone number.</Text>
           )}
 
           <CTextInput
@@ -161,7 +159,7 @@ function ForgetPassword({navigation}) {
             name="user_location"
           />
           {errors.user_location && (
-            <Text style={styles.error}>This is required.</Text>
+            <Text style={styles.error}>Please enter your location.</Text>
           )}
 
           <CTextInput
@@ -176,7 +174,7 @@ function ForgetPassword({navigation}) {
             password
           />
           {errors.user_password && (
-            <Text style={styles.error}>This is required.</Text>
+            <Text style={styles.error}>Please enter your password.</Text>
           )}
 
           <View style={{flex: 1, margin: 30}}>
@@ -228,5 +226,6 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     fontSize: fontSize.small,
+    marginLeft: 20,
   },
 });

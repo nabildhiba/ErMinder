@@ -1,6 +1,12 @@
 // import SplashScreen from 'react-native-splash-screen';
 import React, {useState, useEffect} from 'react';
-import {SafeAreaView, StyleSheet, View} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Text,
+  // TouchableOpacity,
+} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -18,6 +24,7 @@ import ProfileTab from './screens/ProfileTab';
 import {MoreStackHeader} from './components/MoreStackHeader';
 import ForgetPassword from './screens/ForgetPassword';
 import auth from '@react-native-firebase/auth';
+// import IIcon from 'react-native-vector-icons/Ionicons';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +64,32 @@ const MoreStack = ({navigation}) => {
   );
 };
 
+const Header = () => {
+  return (
+    <View
+      style={{
+        padding: 10,
+        paddingHorizontal: 20,
+        backgroundColor: '#4094C1',
+        flexDirection: 'row',
+        alignItems: 'center',
+      }}>
+      {/* <TouchableOpacity onPress={() => props.navigation.goBack()}>
+        <IIcon
+          name="ios-chevron-back"
+          size={25}
+          color="#fff"
+          style={{padding: 10}}
+        />
+      </TouchableOpacity> */}
+      <Text
+        style={{fontSize: 20, fontWeight: '500', color: '#fff', marginLeft: 5}}>
+        Alarms
+      </Text>
+    </View>
+  );
+};
+
 const HomeNavigation = () => (
   <Tab.Navigator
     tabBar={props => <TabBar {...props} />}
@@ -69,6 +102,7 @@ const HomeNavigation = () => (
       name="AlarmTab"
       options={{
         tabBarLabel: '',
+        header: Header,
       }}
       component={AlarmTab}
     />

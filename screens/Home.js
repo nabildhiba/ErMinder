@@ -74,9 +74,15 @@ const DistanceAlarmCard = ({
             onPress={() => pickerRef.current.focus()}
             style={{flexDirection: 'row'}}>
             <Text style={styles.text}>{`${selectDistance} mile(s)`}</Text>
-            <IIcon name="chevron-down" size={20} color="#fff" />
+            <IIcon
+              name="chevron-down"
+              size={20}
+              color="#fff"
+              style={{position: 'relative', top: 5, right: 2}}
+            />
             <Picker
-              dropdownIconColor="#319EA700"
+              style={{flex: 1, zIndex: 55555}}
+              dropdownIconColor="#2BA29D"
               ref={pickerRef}
               selectedValue={selectDistance}
               onValueChange={itemValue => setSelectDistance(itemValue)}>
@@ -208,24 +214,33 @@ const NotificationViaCard = ({notificationVia, setNotificationVia}) => {
           style={{
             justifyContent: 'space-between',
             flexDirection: 'row',
-            marginBottom: -10,
+            marginBottom: -20,
+            paddingHorizontal: 10,
           }}>
-          <Text style={styles.text}>Notification via:</Text>
+          <Text style={styles.text}>Notification via: </Text>
           <TouchableOpacity
             onPress={() => pickerRef.current.focus()}
             style={{flexDirection: 'row'}}>
             <Text style={styles.text}>{notificationVia}</Text>
-            <IIcon name="chevron-down" size={20} color="#fff" />
+            <IIcon
+              name="chevron-down"
+              size={20}
+              color="#fff"
+              style={{position: 'relative', top: 5}}
+            />
             <Picker
-              dropdownIconColor="#319EA700"
+              dropdownIconColor="#2BA29D"
               ref={pickerRef}
               selectedValue={notificationVia}
               onValueChange={(itemValue, itemIndex) =>
                 setNotificationVia(itemValue)
               }>
+              <Picker.Item label="Notification" value={'push_notification'} />
+              <Picker.Item label="Email" value={'email'} enabled={false} />
               <Picker.Item
-                label="App Notification"
-                value={'push_notification'}
+                label="Ringtone"
+                value={'ringtone'}
+                enabled={false}
               />
             </Picker>
           </TouchableOpacity>
@@ -506,6 +521,10 @@ function Home({route, navigation}) {
         onPress={onMapPress}
         showsUserLocation
         showsMyLocationButton={false}
+        userLocationUpdateInterval={15000}
+        showsPointsOfInterest={false}
+        showsCompass={false}
+        loadingEnabled
         onRegionChangeComplete={setRegion}>
         {marker?.coordinate && <Marker coordinate={marker.coordinate} />}
         {alarmRef.current.map(item => {
@@ -599,6 +618,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 22,
     color: '#fff',
+    position: 'relative',
+    left: -5,
   },
 });
 

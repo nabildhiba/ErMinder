@@ -188,7 +188,7 @@ function Login({navigation}) {
       />
       <View
         style={{
-          height: 65,
+          marginTop: 35,
           paddingLeft: 15,
         }}></View>
       <View
@@ -234,7 +234,9 @@ function Login({navigation}) {
           if (isVerificationCode) setIsVerificationCode(false);
         }}
       />
-      {errors.user_name && <Text style={styles.error}>This is required.</Text>}
+      {errors.user_name && (
+        <Text style={styles.error}>Please enter your email.</Text>
+      )}
       <CTextInput
         control={control}
         rules={{
@@ -248,7 +250,7 @@ function Login({navigation}) {
         // defaultValue={userData.question_detail}
       />
       {errors.user_password && (
-        <Text style={styles.error}>This is required.</Text>
+        <Text style={styles.error}>Please enter your password.</Text>
       )}
       <View style={styles.checkboxContainer}>
         <Text
@@ -319,21 +321,24 @@ function Login({navigation}) {
           onPress={() => {
             navigation.navigate('SignUp');
           }}>
-          <Text style={{fontSize: fontSize.normal}}>No account? Sign up</Text>
+          <Text style={{fontSize: fontSize.medium, marginTop: 8}}>
+            No account? Sign up
+          </Text>
         </TouchableOpacity>
-        {/* <Button
+        <Button
           text={'Continue without login'}
           textStyle={{color: colors.text, fontSize: fontSize.small}}
           style={{backgroundColor: '#fff', marginTop: 10}}
           onPress={() => {
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 1,
-                routes: [{name: 'HomeNavigation'}],
-              }),
-            );
+            auth().signInAnonymously();
+            // navigation.dispatch(
+            //   CommonActions.reset({
+            //     index: 1,
+            //     routes: [{name: 'HomeNavigation'}],
+            //   }),
+            // );
           }}
-        /> */}
+        />
       </View>
       {/* </View> */}
       {/* </View> */}
@@ -362,5 +367,8 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     fontSize: fontSize.small,
+    marginLeft: 20,
+    // position: 'absolute',
+    marginTop: 2,
   },
 });
