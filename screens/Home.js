@@ -19,7 +19,7 @@ import {showMessage} from 'react-native-flash-message';
 import SearchBar from '../components/SearchBar';
 import AppCheckbox from '../components/AppCheckbox';
 import Spinner from '../components/Spinner';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {Marker, PROVIDER_GOOGLE, Circle} from 'react-native-maps';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {Picker} from '@react-native-picker/picker';
 import IIcon from 'react-native-vector-icons/Ionicons';
@@ -32,7 +32,7 @@ import notifee from '@notifee/react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import LinearGradient from 'react-native-linear-gradient';
-
+import axios from 'axios';
 const milesArray = [1, 2, 5, 10, 20];
 
 const DistanceAlarmCard = ({
@@ -266,6 +266,10 @@ function Home({route, navigation}) {
   const [timeCheckbox, setTimeCheckbox] = useState(false);
   const [loading, setLoading] = useState(false);
   const alarmRef = useRef([]);
+  const firstTime = useRef(true);
+  const [currentLocation, setCurrentLocation] = useState({});
+  const mapRef = useRef(null);
+  // console.log('currentLocation', currentLocation);
   const [region, setRegion] = useState({
     latitude: 28,
     longitude: 76,
@@ -296,69 +300,81 @@ function Home({route, navigation}) {
     // debugCollection.add(object);
   };
 
-  const performTask = async () => {
-    getLocation().then(async res => {
-      addDebugObject({
-        type: 'current location',
-        res,
-      });
+  const performOperation = coords => {
+    addDebugObject({
+      type: 'current location',
+      coords,
+    });
+    setCurrentLocation(coords);
+    if (firstTime.current) {
       setRegion({
-        latitude: res.coords.latitude,
-        longitude: res.coords.longitude,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
-      alarmRef.current.forEach(item => {
-        if (item.isActive && item.distanceAlarm) {
-          const distance = getDistanceFromLatLon(
-            res.coords.latitude,
-            res.coords.longitude,
-            item.coordinate.latitude,
-            item.coordinate.longitude,
-          );
-          console.log(distance);
-          addDebugObject({
-            type: 'distanceAlarm',
-            distance,
-          });
-          if (distance <= item.distance) {
-            if (auth()?.currentUser?.uid) {
-              firestore()
-                .collection('Users')
-                .doc(auth().currentUser.uid)
-                .collection('Alarms')
-                .doc(item.id)
-                .update({isActive: false});
-            }
-            onDisplayNotification(
-              item.location,
-              `You are ${distance.toFixed(2)} miles away from ${item.location}`,
-            );
-          }
-        }
-        if (item.isActive && item.timeAlarm) {
-          const distance = getDistanceFromLatLon(
-            res.coords.latitude,
-            res.coords.longitude,
-            item.coordinate.latitude,
-            item.coordinate.longitude,
-          );
-          const timeDifference = Math.abs(
-            differenceInMinutes(new Date(item.dateTime), new Date()),
-          );
-          console.log(4, timeDifference);
-          if (distance <= 2 && timeDifference <= 15) {
-            onDisplayNotification(
-              `Time alarm (${item.location}) - ${formatDistanceToNow(
-                new Date(item.dateTime),
-              )}`,
-              `2 You are ${distance.toFixed(2)} miles away from ${
-                item.location
-              }`,
-            );
-          }
-        }
+      mapRef.current.animateToRegion({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
       });
+      firstTime.current = false;
+    }
+    alarmRef.current.forEach(item => {
+      if (item.isActive && item.distanceAlarm) {
+        const distance = getDistanceFromLatLon(
+          coords.latitude,
+          coords.longitude,
+          item.coordinate.latitude,
+          item.coordinate.longitude,
+        );
+        // console.log(distance);
+        addDebugObject({
+          type: 'distanceAlarm',
+          distance,
+        });
+        if (distance <= item.distance) {
+          if (auth()?.currentUser?.uid) {
+            firestore()
+              .collection('Users')
+              .doc(auth().currentUser.uid)
+              .collection('Alarms')
+              .doc(item.id)
+              .update({isActive: false});
+          }
+          onDisplayNotification(
+            item.location,
+            `You are ${distance.toFixed(2)} miles away from ${item.location}`,
+          );
+        }
+      }
+      if (item.isActive && item.timeAlarm) {
+        const distance = getDistanceFromLatLon(
+          coords.latitude,
+          coords.longitude,
+          item.coordinate.latitude,
+          item.coordinate.longitude,
+        );
+        const timeDifference = Math.abs(
+          differenceInMinutes(new Date(item.dateTime), new Date()),
+        );
+        // console.log(4, timeDifference);
+        if (distance <= 2 && timeDifference <= 15) {
+          onDisplayNotification(
+            `Time alarm (${item.location}) - ${formatDistanceToNow(
+              new Date(item.dateTime),
+            )}`,
+            `2 You are ${distance.toFixed(2)} miles away from ${item.location}`,
+          );
+        }
+      }
+    });
+  };
+
+  const performTask = async () => {
+    getLocation().then(async res => {
+      performOperation(res.coords);
     });
   };
 
@@ -369,9 +385,7 @@ function Home({route, navigation}) {
     rawSheetRef.current.open();
   };
 
-  const onSubmit = () => {
-    console.log(auth().currentUser.uid);
-    console.log(!(distanceCheckbox || timeCheckbox));
+  const onSubmit = async () => {
     if (!(distanceCheckbox || timeCheckbox)) {
       showMessage({
         message: 'Please select atleast one option.',
@@ -381,6 +395,9 @@ function Home({route, navigation}) {
     }
     if (auth()?.currentUser?.uid) {
       setLoading(true);
+      const resluts = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=AIzaSyCZgPZ3f4_DaC4Rh7qFAQSQu_9K4SSQLPk`,
+      );
       const Alarms = firestore()
         .collection('Users')
         .doc(auth().currentUser.uid)
@@ -391,8 +408,8 @@ function Home({route, navigation}) {
         date: date,
         time: time,
         coordinate: marker.coordinate,
-        location: 'Delhi',
-        distance: 2,
+        location: resluts.data?.results[0]?.formatted_address ?? 'Unknown',
+        distance: selectDistance,
         notificationVia: notificationVia,
         dateTime: `${format(date, 'yyyy-MM-dd')}T${format(time, 'HH:mm:ss')}`,
         dateTimeFormatted: `${format(date, 'dd/MM/yyyy')} ${format(
@@ -405,6 +422,7 @@ function Home({route, navigation}) {
         .then(() => {
           setLoading(false);
           setTimeCheckbox(false);
+          setMarker({});
           setDistanceCheckbox(false);
           rawSheetRef.current.close();
           showMessage({
@@ -424,7 +442,7 @@ function Home({route, navigation}) {
   useEffect(() => {
     BackgroundTimer.runBackgroundTimer(() => {
       performTask();
-    }, 5000);
+    }, 30000);
     return () => {
       BackgroundTimer.stopBackgroundTimer();
     };
@@ -471,18 +489,74 @@ function Home({route, navigation}) {
   return (
     <>
       <MapView
+        ref={mapRef}
         style={{flex: 1}}
         provider={PROVIDER_GOOGLE}
-        region={region}
+        // region={region}
         // initialRegion={{
         //   latitude: 37.78825,
         //   longitude: -122.4324,
         //   latitudeDelta: 0.0922,
         //   longitudeDelta: 0.0421,
         // }}
-        onPress={onMapPress}>
+        onUserLocationChange={e => {
+          // console.log(e.nativeEvent.coordinate);
+          performOperation(e.nativeEvent.coordinate);
+        }}
+        onPress={onMapPress}
+        showsUserLocation
+        showsMyLocationButton={false}
+        onRegionChangeComplete={setRegion}>
         {marker?.coordinate && <Marker coordinate={marker.coordinate} />}
+        {alarmRef.current.map(item => {
+          if (!item.distanceAlarm || !item.isActive) {
+            return null;
+          }
+          console.log();
+          return (
+            <>
+              <Circle
+                center={{
+                  latitude: item.coordinate.latitude,
+                  longitude: item.coordinate.longitude,
+                }}
+                radius={item.distance * 1609.34}
+                fillColor="rgba(0, 0, 255, 0.05)"
+                strokeColor="rgba(100, 100, 100, 0.5)"
+                zIndex={2}
+                strokeWidth={1}
+              />
+              <Marker
+                coordinate={{
+                  latitude: item.coordinate.latitude,
+                  longitude: item.coordinate.longitude,
+                }}
+              />
+            </>
+          );
+        })}
       </MapView>
+      <SearchBar
+        onPress={(data, details = null) => {
+          // 'details' is provided when fetchDetails = true
+          // console.log(details.geometry.location);
+          const {lat: latitude, lng: longitude} = details.geometry.location;
+          setRegion(prev => ({...prev, latitude, longitude}));
+          mapRef.current.animateToRegion({
+            latitude: latitude,
+            longitude: longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          });
+        }}
+      />
+      {/* <View style={{position: 'absolute', top: 50}}>
+        <Text
+          style={{
+            fontSize: 20,
+            color: 'red',
+          }}>{`${currentLocation?.latitude}-${currentLocation?.longitude}`}</Text>
+      </View> */}
       <View>
         {/* <SearchBar /> */}
         <RBSheet

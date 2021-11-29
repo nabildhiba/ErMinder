@@ -13,6 +13,7 @@ import {showMessage} from 'react-native-flash-message';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import auth from '@react-native-firebase/auth';
 import {CommonActions} from '@react-navigation/routers';
+import firestore from '@react-native-firebase/firestore';
 
 const {height, width} = Dimensions.get('screen');
 
@@ -33,7 +34,18 @@ function ForgetPassword({navigation}) {
     setIsLoading(true);
     auth()
       .createUserWithEmailAndPassword(data.user_email, data.user_password)
-      .then(res => {
+      .then(async res => {
+        const userDB = firestore().collection('Users').doc(res.user.uid);
+        await userDB.set(
+          {
+            email: data.user_email,
+            phone: data.user_phone,
+            location: data.user_location,
+            password: data.user_password,
+          },
+          {merge: true},
+        );
+
         showMessage({
           message: 'Your account has been created.',
           type: 'success',
@@ -118,7 +130,6 @@ function ForgetPassword({navigation}) {
           )}
 
           <CTextInput
-            autoFocus={true}
             control={control}
             rules={{
               required: true,
@@ -133,13 +144,13 @@ function ForgetPassword({navigation}) {
               />
             }
             name="user_phone"
+            keyboardType="phone-pad"
           />
           {errors.user_phone && (
             <Text style={styles.error}>This is required.</Text>
           )}
 
           <CTextInput
-            autoFocus={true}
             control={control}
             rules={{
               required: true,
@@ -154,7 +165,6 @@ function ForgetPassword({navigation}) {
           )}
 
           <CTextInput
-            autoFocus={true}
             control={control}
             rules={{
               required: true,
@@ -163,6 +173,7 @@ function ForgetPassword({navigation}) {
             placeholder={'Password'}
             icon={<FIcon name="locked" size={20} color={colors.primary} />}
             name="user_password"
+            password
           />
           {errors.user_password && (
             <Text style={styles.error}>This is required.</Text>

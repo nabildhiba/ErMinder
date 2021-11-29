@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 20,
+    width: '80%',
   },
   text: {
     color: 'white',

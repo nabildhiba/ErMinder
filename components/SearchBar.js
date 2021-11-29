@@ -1,32 +1,87 @@
-import React from 'react';
-import {TouchableOpacity, StyleSheet, View, TextInput} from 'react-native';
-import colors from '../constant/colors.json';
-import {Text} from '../components/Text';
+import React, {useRef} from 'react';
+import {TouchableOpacity, StyleSheet, View, Dimensions} from 'react-native';
+import IIcon from 'react-native-vector-icons/Ionicons';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
-export default function SearchBar({style = {}}) {
+const {width} = Dimensions.get('screen');
+
+export default function SearchBar({onPress}) {
+  const [text, onChangeText] = React.useState('');
+  const autoCompleteRef = useRef();
+  console.log(text);
   return (
-    <View style={{position: 'absolute', top: 50}}>
-      <Text style={{fontSize: 50}}>465465465</Text>
-      {/* <TextInput style={{width: 50, height: 20, backgroundColor: 'red'}} /> */}
-      {/* <Text style={{color: 'red', zIndex: 50}}>
-        lorems fhskjdfh ksdhfksdj hfkjsdhfkj shdfkjh sdkfhsdkjfhskd fkjsdhf
-        kjsdhf kj
-      </Text> */}
+    <View style={styles.container}>
+      <GooglePlacesAutocomplete
+        ref={autoCompleteRef}
+        placeholder="Search"
+        onPress={onPress}
+        query={{
+          key: 'AIzaSyCZgPZ3f4_DaC4Rh7qFAQSQu_9K4SSQLPk',
+          language: 'en',
+        }}
+        styles={{
+          textInput: {
+            borderRadius: 20,
+            paddingHorizontal: 15,
+          },
+        }}
+        textInputProps={{onChangeText}}
+        enablePoweredByContainer={false}
+        fetchDetails
+        // GoogleReverseGeocodingQuery
+      />
+      {text === '' ? (
+        <TouchableOpacity
+          onPress={() => {
+            autoCompleteRef?.current?.setAddressText('');
+            onChangeText('');
+          }}
+          style={styles.iconContainer}>
+          <IIcon name="ios-search" size={20} color="#808080" />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          onPress={() => {
+            autoCompleteRef?.current?.setAddressText('');
+            onChangeText('');
+          }}
+          style={styles.iconContainer}>
+          <IIcon name="close" size={20} color="#808080" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 18,
-    borderRadius: 15,
+    position: 'absolute',
+    top: 10,
+    alignSelf: 'center',
     flexDirection: 'row',
+    width: width * 0.85,
   },
-  text: {
-    fontSize: 16,
-    color: '#fff',
+  input: {
+    height: 40,
+    width: width * 0.8,
+    margin: 12,
+    // borderWidth: 1,
+    borderRadius: 15,
+    padding: 10,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+  },
+  iconContainer: {
+    position: 'absolute',
+    right: 15,
+    top: 12,
   },
 });

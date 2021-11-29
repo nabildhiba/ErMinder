@@ -19,9 +19,25 @@ import FIcon from 'react-native-vector-icons/Fontisto';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EIcon from 'react-native-vector-icons/Entypo';
 import {showMessage} from 'react-native-flash-message';
-import EncryptedStorage from 'react-native-encrypted-storage';
 import {CommonActions} from '@react-navigation/routers';
 import auth from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure({
+  webClientId:
+    '108353413486-ibnungoagc64o9k8eno2ctcfa3f6i8dn.apps.googleusercontent.com',
+});
+
+async function onGoogleButtonPress() {
+  // Get the users ID token
+  const {idToken} = await GoogleSignin.signIn();
+
+  // Create a Google credential with the token
+  const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+  // Sign-in the user with the credential
+  return auth().signInWithCredential(googleCredential);
+}
 
 const {height, width} = Dimensions.get('screen');
 
@@ -46,6 +62,14 @@ function Login({navigation}) {
   // Handle user state changes
   function onAuthStateChanged(user) {
     // console.log(user);
+    if (user) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: 'HomeNavigation'}],
+        }),
+      );
+    }
     // setUser(user);
     if (initializing) setInitializing(false);
   }
@@ -61,15 +85,14 @@ function Login({navigation}) {
     setIsLoading(true);
     auth()
       .signInWithEmailAndPassword(data.user_name, data.user_password)
-      .then(() => {
-        setIsLoading(false);
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 1,
-            routes: [{name: 'HomeNavigation'}],
-          }),
-        );
-      })
+      // .then(() => {
+      //   navigation.dispatch(
+      //     CommonActions.reset({
+      //       index: 1,
+      //       routes: [{name: 'HomeNavigation'}],
+      //     }),
+      //   );
+      // })
       .catch(error => {
         const errorMessage = error.message;
         console.log(errorMessage);
@@ -77,6 +100,9 @@ function Login({navigation}) {
           message: errorMessage,
           type: 'danger',
         });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
     // setEmail(data.user_name);
     // setIsLoading(true);
@@ -270,10 +296,21 @@ function Login({navigation}) {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <Image
-            source={require('../assets/google.png')}
-            style={{height: 35, width: 35, borderRadius: 35}}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              onGoogleButtonPress()
+                .then(() => {
+                  console.log('Success');
+                })
+                .catch(err => {
+                  console.log(JSON.stringify(err));
+                });
+            }}>
+            <Image
+              source={require('../assets/google.png')}
+              style={{height: 35, width: 35, borderRadius: 35}}
+            />
+          </TouchableOpacity>
           {/* <MCIcon name="google" size={40} color={'#000'} /> */}
           <MCIcon name="facebook" size={40} color={'#3b5998'} />
           <EIcon name="twitter-with-circle" size={40} color={'#1DA1F2'} />

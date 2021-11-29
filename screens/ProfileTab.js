@@ -11,6 +11,7 @@ import {Text} from '../components/Text';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import {launchImageLibrary} from 'react-native-image-picker';
+import firestore from '@react-native-firebase/firestore';
 
 const PIC_SIZE = 150;
 
@@ -29,11 +30,24 @@ function ProfileTab({navigation}) {
     const currentUser = auth().currentUser;
     if (currentUser) {
       setUser(currentUser);
+      firestore()
+        .collection('Users')
+        .doc(currentUser.uid)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            console.log('Document data:', doc.data());
+            setUser(prev => ({...prev, ...doc.data()}));
+          } else {
+            // doc.data() will be undefined in this case
+            console.log('No such document!');
+          }
+        });
     }
   }, []);
 
   const getProfilePhoto = async () => {
-    const result = await launchImageLibrary();
+    const result = await launchImageLibrary({quality: 0.5});
     if (!result?.didCancel && result?.assets[0]?.uri) {
       let reference = storage().ref(result?.assets[0]?.fileName);
       let task = reference.putFile(result?.assets[0]?.uri);
@@ -81,11 +95,11 @@ function ProfileTab({navigation}) {
           </View>
         </View>
         <View style={styles.infoContainer}>
-          <InfoRow placeholder="Username" value="Justin" />
+          {/* <InfoRow placeholder="Username" value="Justin" /> */}
           <InfoRow placeholder="Email" value={user?.email ?? '-'} />
-          <InfoRow placeholder="Location" value="Delhi (NCR)" />
-          <InfoRow placeholder="Phone number" value="+91-8888881548" />
-          <InfoRow placeholder="Password" value="************" />
+          <InfoRow placeholder="Location" value={user?.location ?? '-'} />
+          <InfoRow placeholder="Phone number" value={user?.phone ?? '-'} />
+          {/* <InfoRow placeholder="Password" value={user?.email ?? '-'} /> */}
         </View>
       </ImageBackground>
     </ScrollView>
