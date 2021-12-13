@@ -15,6 +15,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import LinearGradient from 'react-native-linear-gradient';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import colors from '../constant/colors.json';
 
 if (
   Platform.OS === 'android' &&
@@ -38,6 +40,17 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
     }
   };
 
+  const deleteAlarm = () => {
+    if (auth()?.currentUser?.uid) {
+      firestore()
+        .collection('Users')
+        .doc(auth().currentUser.uid)
+        .collection('Alarms')
+        .doc(data.item.id)
+        .delete();
+    }
+  };
+
   useEffect(() => {
     setIsEnabled(data.item.isActive);
   }, [data.item.isActive]);
@@ -46,8 +59,6 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
   if (!data.item.timeAlarm && !data.item.distanceAlarm) {
     return null;
   }
-
-  console.log(data, cardOpenIndex);
 
   return (
     <View style={styles.cardContainer}>
@@ -82,6 +93,13 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
           {data.item.timeAlarm && (
             <Text style={styles.text}>Time Alarm: {data.item.dateTime}</Text>
           )}
+          <MaterialIcons
+            onPress={deleteAlarm}
+            style={{position: 'absolute', bottom: 0, right: 0, padding: 10}}
+            name="delete"
+            size={25}
+            color={colors.white}
+          />
         </LinearGradient>
       </TouchableOpacity>
       {data.index === cardOpenIndex && (
@@ -104,7 +122,10 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
             liteMode
             showsMyLocationButton={false}>
             {data.item?.coordinate && (
-              <Marker coordinate={data.item.coordinate} />
+              <Marker
+                pinColor={colors.skyblue}
+                coordinate={data.item.coordinate}
+              />
             )}
           </MapView>
         </View>
@@ -204,6 +225,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#319EA7',
     padding: 15,
+    position: 'relative',
   },
   cardContainer: {
     marginTop: 20,

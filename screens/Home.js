@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
   Permissi,
+  PermissionsAndroid,
 } from 'react-native';
 import QuestionsCard from '../components/QuestionsCard';
 import SearchBox from '../components/SearchBox';
@@ -23,6 +24,7 @@ import MapView, {Marker, PROVIDER_GOOGLE, Circle} from 'react-native-maps';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {Picker} from '@react-native-picker/picker';
 import IIcon from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {format, differenceInMinutes, formatDistanceToNow} from 'date-fns';
 import BackgroundTimer from 'react-native-background-timer';
@@ -33,7 +35,44 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
+import Geolocation from '@react-native-community/geolocation';
 const milesArray = [1, 2, 5, 10, 20];
+
+notifee.onBackgroundEvent(async ({type, detail}) => {
+  // const {notification, pressAction} = detail;
+  // Check if the user pressed the "Mark as read" action
+  // if (type === EventType.ACTION_PRESS && pressAction.id === 'mark-as-read') {
+  //   // Update external API
+  //   await fetch(`https://my-api.com/chat/${notification.data.chatId}/read`, {
+  //     method: 'POST',
+  //   });
+  //   // Remove the notification
+  //   await notifee.cancelNotification(notification.id);
+  // }
+});
+
+const requestBackgroundLocationPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+      {
+        title: 'Allow Location Access',
+        message:
+          'App needs to access your backgroud location to alert you when you are near a location, your location will not be stored online/offline',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('You can use the background location');
+    } else {
+      console.log('Background location permission denied');
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+};
 
 const DistanceAlarmCard = ({
   distanceCheckbox,
@@ -282,7 +321,6 @@ function Home({route, navigation}) {
   const [loading, setLoading] = useState(false);
   const alarmRef = useRef([]);
   const firstTime = useRef(true);
-  const [currentLocation, setCurrentLocation] = useState({});
   const mapRef = useRef(null);
   // console.log('currentLocation', currentLocation);
   const [region, setRegion] = useState({
@@ -297,6 +335,7 @@ function Home({route, navigation}) {
     const channelId = await notifee.createChannel({
       id: 'default',
       name: 'Default Channel',
+      sound: 'default',
     });
 
     // Display a notification
@@ -305,6 +344,7 @@ function Home({route, navigation}) {
       body,
       android: {
         channelId,
+        sound: 'default',
         // smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
       },
     });
@@ -320,7 +360,6 @@ function Home({route, navigation}) {
       type: 'current location',
       coords,
     });
-    setCurrentLocation(coords);
     if (firstTime.current) {
       setRegion({
         latitude: coords.latitude,
@@ -337,7 +376,26 @@ function Home({route, navigation}) {
       firstTime.current = false;
     }
     alarmRef.current.forEach(item => {
-      if (item.isActive && item.distanceAlarm) {
+      if (item.isActive && item.timeAlarm && item.distanceAlarm) {
+        const distance = getDistanceFromLatLon(
+          coords.latitude,
+          coords.longitude,
+          item.coordinate.latitude,
+          item.coordinate.longitude,
+        );
+        const timeDifference = Math.abs(
+          differenceInMinutes(new Date(item.dateTime), new Date()),
+        );
+        // console.log(4, timeDifference);
+        if (distance <= item.distance && timeDifference <= 15) {
+          onDisplayNotification(
+            `Time alarm (${item.location}) - ${formatDistanceToNow(
+              new Date(item.dateTime),
+            )}`,
+            `2 You are ${distance.toFixed(2)} miles away from ${item.location}`,
+          );
+        }
+      } else if (item.isActive && item.distanceAlarm) {
         const distance = getDistanceFromLatLon(
           coords.latitude,
           coords.longitude,
@@ -363,8 +421,7 @@ function Home({route, navigation}) {
             `You are ${distance.toFixed(2)} miles away from ${item.location}`,
           );
         }
-      }
-      if (item.isActive && item.timeAlarm) {
+      } else if (item.isActive && item.timeAlarm) {
         const distance = getDistanceFromLatLon(
           coords.latitude,
           coords.longitude,
@@ -401,9 +458,9 @@ function Home({route, navigation}) {
   };
 
   const onSubmit = async () => {
-    if (!(distanceCheckbox || timeCheckbox)) {
+    if (!distanceCheckbox) {
       showMessage({
-        message: 'Please select atleast one option.',
+        message: 'Distance alarm is mandatory',
         type: 'danger',
       });
       return;
@@ -455,6 +512,19 @@ function Home({route, navigation}) {
   };
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+      ).then(response => {
+        console.log(response);
+      });
+    }, 10000);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  useEffect(() => {
     BackgroundTimer.runBackgroundTimer(() => {
       performTask();
     }, 30000);
@@ -465,6 +535,7 @@ function Home({route, navigation}) {
   }, []);
 
   useEffect(() => {
+    // requestBackgroundLocationPermission();
     if (auth()?.currentUser?.uid) {
       // const allAlarms = [];
       firestore()
@@ -521,17 +592,20 @@ function Home({route, navigation}) {
         onPress={onMapPress}
         showsUserLocation
         showsMyLocationButton={false}
+        // showsMyLocationButton
         userLocationUpdateInterval={15000}
         showsPointsOfInterest={false}
         showsCompass={false}
         loadingEnabled
         onRegionChangeComplete={setRegion}>
-        {marker?.coordinate && <Marker coordinate={marker.coordinate} />}
+        {marker?.coordinate && (
+          <Marker pinColor={colors.skyblue} coordinate={marker.coordinate} />
+        )}
         {alarmRef.current.map(item => {
           if (!item.distanceAlarm || !item.isActive) {
             return null;
           }
-          console.log();
+          // return null;
           return (
             <>
               <Circle
@@ -546,6 +620,7 @@ function Home({route, navigation}) {
                 strokeWidth={1}
               />
               <Marker
+                pinColor={colors.skyblue}
                 coordinate={{
                   latitude: item.coordinate.latitude,
                   longitude: item.coordinate.longitude,
@@ -569,6 +644,38 @@ function Home({route, navigation}) {
           });
         }}
       />
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 10,
+          right: 10,
+          backgroundColor: colors.white,
+          padding: 15,
+          borderRadius: 50,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 5,
+          },
+          shadowOpacity: 0.34,
+          shadowRadius: 6.27,
+          elevation: 10,
+        }}
+        onPress={() => {
+          Geolocation.getCurrentPosition(info => {
+            if (info?.coords) {
+              const {coords} = info;
+              mapRef.current.animateToRegion({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              });
+            }
+          });
+        }}>
+        <MaterialIcons name="my-location" size={25} color={colors.gray} />
+      </TouchableOpacity>
       {/* <View style={{position: 'absolute', top: 50}}>
         <Text
           style={{
