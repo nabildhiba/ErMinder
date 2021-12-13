@@ -7,6 +7,7 @@
   "textSecondary": "#AFAFBD",
   "gray": "gray",
   "white": "#fff",
+  "liteGrey": "#e3e0e0",
   "transparentGray": "#808080db",
   "skyblue": "#329EA8"
 }

@@ -17,6 +17,7 @@ import MIcon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../constant/colors.json';
 import fontSize from '../constant/fontSize.json';
 import {Text} from './Text';
+import LinearGradient from 'react-native-linear-gradient';
 
 const {width} = Dimensions.get('screen');
 export default function TabBar({state, descriptors, navigation}) {
@@ -65,7 +66,7 @@ export default function TabBar({state, descriptors, navigation}) {
           <IIcon
             name={'ios-location'}
             size={20}
-            color={isFocused ? colors.skyblue : colors.gray}
+            color={isFocused ? colors.white : colors.liteGrey}
           />
         );
       case 'SettingTab':
@@ -73,7 +74,7 @@ export default function TabBar({state, descriptors, navigation}) {
           <IIcon
             name={'ios-settings'}
             size={20}
-            color={isFocused ? colors.skyblue : colors.gray}
+            color={isFocused ? colors.white : colors.liteGrey}
           />
         );
       case 'AlarmTab':
@@ -81,7 +82,7 @@ export default function TabBar({state, descriptors, navigation}) {
           <IIcon
             name={'ios-alarm-outline'}
             size={20}
-            color={isFocused ? colors.skyblue : colors.gray}
+            color={isFocused ? colors.white : colors.liteGrey}
           />
         );
 
@@ -90,7 +91,7 @@ export default function TabBar({state, descriptors, navigation}) {
           <IIcon
             name={'ios-power'}
             size={20}
-            color={isFocused ? colors.skyblue : colors.gray}
+            color={isFocused ? colors.white : colors.liteGrey}
           />
         );
       default:
@@ -100,6 +101,12 @@ export default function TabBar({state, descriptors, navigation}) {
 
   return (
     // <BoxShadow setting={shadowOpt}>
+    <LinearGradient colors={[colors.primary,colors.sec_Primary]} 
+    style={{
+      width: '100%',
+      }}
+      >
+ 
     <View
       style={{
         width: '100%',
@@ -143,7 +150,7 @@ export default function TabBar({state, descriptors, navigation}) {
               height: 80,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: '#fff',
+              // backgroundColor: '#fff',
             }}>
             {routeIcon({name: route.name, isFocused})}
             {/* {route.name === 'LocationTab' ? (
@@ -180,7 +187,7 @@ export default function TabBar({state, descriptors, navigation}) {
                   />
                 )
               )} */}
-            <Text style={{color: isFocused ? colors.primary : colors.gray}}>
+            <Text style={{color: isFocused ? colors.white : colors.liteGrey}}>
               {routeName(route.name)}
               {/* {route.name === 'LocationTab'
                   ? 'HOME'
@@ -192,6 +199,7 @@ export default function TabBar({state, descriptors, navigation}) {
         );
       })}
     </View>
+    </LinearGradient>
     // </BoxShadow>
   );
 }

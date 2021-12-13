@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
-  Switch,
   FlatList,
   TouchableOpacity,
   LayoutAnimation,
@@ -17,6 +16,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import colors from '../constant/colors.json';
+import {Switch} from 'react-native-switch';
+import ToggleSwitch from 'toggle-switch-react-native';
 
 if (
   Platform.OS === 'android' &&
@@ -76,14 +77,23 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
           style={styles.alramCard}>
           <View style={styles.cardRow}>
             <Text style={styles.bigText}>{data.item.location}</Text>
-            <Switch
-              trackColor={{false: '#767577', true: 'white'}}
+            <ToggleSwitch
+              isOn={isEnabled}
+              onColor="white"
+              offColor="grey"
+              size="small"
+              onToggle={toggleSwitch}
+              thumbOnStyle={styles.thumbStyle}
+              thumbOffStyle={{...styles.thumbStyle, left: -10}}
+            />
+            {/* <Switch
+              trackColor={{false: colors.gray, true: 'white'}}
               thumbColor={isEnabled ? '#329EA8' : '#329EA8'}
               ios_backgroundColor="#3e3e3e"
               onValueChange={toggleSwitch}
               value={isEnabled}
               style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
-            />
+            /> */}
           </View>
           {data.item.distanceAlarm && (
             <Text style={styles.text}>
@@ -245,6 +255,7 @@ const styles = StyleSheet.create({
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingRight: 10,
   },
   bigText: {
     color: 'white',
@@ -255,6 +266,22 @@ const styles = StyleSheet.create({
   text: {
     color: 'white',
     fontSize: 18,
+  },
+  thumbStyle: {
+    backgroundColor: colors.primary,
+    height: 25,
+    width: 25,
+    borderWidth: 2,
+    borderRadius: 30,
+    borderColor: colors.white,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.32,
+    shadowRadius: 5.46,
+    elevation: 9,
   },
 });
 
