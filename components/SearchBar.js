@@ -22,7 +22,8 @@ export default function SearchBar({onPress}) {
         styles={{
           textInput: {
             borderRadius: 20,
-            paddingHorizontal: 15,
+            paddingLeft: 15,
+            paddingRight: 36,
           },
         }}
         textInputProps={{onChangeText}}
