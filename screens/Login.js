@@ -221,7 +221,6 @@ function Login({navigation}) {
             backgroundColor: colors.backgroundColor,
           }}> */}
       <CTextInput
-        autoFocus={true}
         control={control}
         rules={{
           required: true,
