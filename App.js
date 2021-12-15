@@ -25,6 +25,7 @@ import {MoreStackHeader} from './components/MoreStackHeader';
 import ForgetPassword from './screens/ForgetPassword';
 import auth from '@react-native-firebase/auth';
 // import IIcon from 'react-native-vector-icons/Ionicons';
+import SplashScreen from 'react-native-splash-screen'
 
 const Stack = createNativeStackNavigator();
 
@@ -118,9 +119,12 @@ const App = () => {
     (async () => {
       let userData = auth().currentUser;
       if (userData === undefined || userData === null) {
+        SplashScreen.hide();
         setInitialRoute('LoginNavigation');
         setIsReady(true);
+
       } else {
+        SplashScreen.hide();
         setInitialRoute('HomeNavigation');
         setIsReady(true);
       }
