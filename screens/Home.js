@@ -36,7 +36,7 @@ import auth from '@react-native-firebase/auth';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
-const milesArray = [1, 2, 5, 10, 20];
+const milesArray = [0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769];
 
 notifee.onBackgroundEvent(async ({type, detail}) => {
   // const {notification, pressAction} = detail;
@@ -112,7 +112,7 @@ const DistanceAlarmCard = ({
           <TouchableOpacity
             onPress={() => pickerRef.current.focus()}
             style={{flexDirection: 'row'}}>
-            <Text style={styles.text}>{`${selectDistance} mile(s)`}</Text>
+            <Text style={styles.text}>{`${Math.round(selectDistance * 1609.344)} meter(s)`}</Text>
             <IIcon
               name="chevron-down"
               size={20}
@@ -126,7 +126,7 @@ const DistanceAlarmCard = ({
               selectedValue={selectDistance}
               onValueChange={itemValue => setSelectDistance(itemValue)}>
               {milesArray.map(item => {
-                return <Picker.Item label={`${item} mile(s)`} value={item} />;
+                return <Picker.Item label={`${Math.round(item * 1609.344)} meter(s)`} value={item} />;
               })}
             </Picker>
           </TouchableOpacity>
@@ -392,7 +392,7 @@ function Home({route, navigation}) {
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
             )}`,
-            `2 You are ${distance.toFixed(2)} miles away from ${item.location}`,
+            `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
           );
         }
       } else if (item.isActive && item.distanceAlarm) {
@@ -418,7 +418,7 @@ function Home({route, navigation}) {
           }
           onDisplayNotification(
             item.location,
-            `You are ${distance.toFixed(2)} miles away from ${item.location}`,
+            `You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
           );
         }
       } else if (item.isActive && item.timeAlarm) {
@@ -437,7 +437,7 @@ function Home({route, navigation}) {
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
             )}`,
-            `2 You are ${distance.toFixed(2)} miles away from ${item.location}`,
+            `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
           );
         }
       }
@@ -687,7 +687,7 @@ function Home({route, navigation}) {
         {/* <SearchBar /> */}
         <RBSheet
           ref={rawSheetRef}
-          height={330}
+          height={275}
           openDuration={250}
           customStyles={{
             container: {
@@ -708,10 +708,10 @@ function Home({route, navigation}) {
             timeCheckbox={timeCheckbox}
             setTimeCheckbox={setTimeCheckbox}
           />
-          <NotificationViaCard
+          {/* <NotificationViaCard
             notificationVia={notificationVia}
             setNotificationVia={setNotificationVia}
-          />
+          /> */}
           <SubmitButton onPress={onSubmit} />
         </RBSheet>
       </View>
