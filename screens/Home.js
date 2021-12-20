@@ -36,6 +36,8 @@ import auth from '@react-native-firebase/auth';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
+import moment from 'moment'
+
 const milesArray = [0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769];
 
 notifee.onBackgroundEvent(async ({type, detail}) => {
@@ -141,13 +143,16 @@ const TimeAlarmCard = ({
   setDate,
   time,
   setTime,
+  endTime,
   timeCheckbox,
   setTimeCheckbox,
+  setEndTime
 }) => {
   // const [date, setDate] = useState(new Date());
   // const [time, setTime] = useState(new Date());
   const [showDate, setShowDate] = useState(false);
   const [showTime, setShowTime] = useState(false);
+  const [showEndTime, setShowEndTime] = useState(false);
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDate(Platform.OS === 'ios');
@@ -157,6 +162,20 @@ const TimeAlarmCard = ({
     const currentDate = selectedDate || date;
     setShowTime(Platform.OS === 'ios');
     setTime(currentDate);
+  };
+
+  const onChangeEndTime = (event, selectedDate) => {
+    if(moment(time).diff(selectedDate, 'minutes') > 0) {
+      setShowEndTime(Platform.OS === 'ios');
+      showMessage({
+        message: 'End Time can not be less then start time',
+        type: 'danger',
+      });
+      return
+    }
+    const currentDate = selectedDate || date;
+    setShowEndTime(Platform.OS === 'ios');
+    setEndTime(currentDate);
   };
 
   return (
@@ -209,7 +228,7 @@ const TimeAlarmCard = ({
             justifyContent: 'space-between',
             flexDirection: 'row',
           }}>
-          <Text style={styles.text}>Time:</Text>
+          <Text style={styles.text}>Start Time:</Text>
           <TouchableOpacity
             onPress={() => setShowTime(true)}
             style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -220,9 +239,33 @@ const TimeAlarmCard = ({
                 testID="dateTimePicker"
                 value={time}
                 mode={'time'}
-                is24Hour={true}
+                is24Hour={false}
                 display="default"
                 onChange={onChangeTime}
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+          }}>
+          <Text style={styles.text}>End Time:</Text>
+          <TouchableOpacity
+            onPress={() => setShowEndTime(true)}
+            style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={styles.text}>{format(endTime, 'hh:mm a')}</Text>
+            <IIcon name="chevron-down" size={20} color="#fff" />
+            {showEndTime && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={endTime}
+                minimumDate={time}
+                mode={'time'}
+                is24Hour={false}
+                display="default"
+                onChange={onChangeEndTime}
               />
             )}
           </TouchableOpacity>
@@ -315,6 +358,7 @@ function Home({route, navigation}) {
   const [selectDistance, setSelectDistance] = useState(2);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
   const [notificationVia, setNotificationVia] = useState('App Notification');
   const [distanceCheckbox, setDistanceCheckbox] = useState(false);
   const [timeCheckbox, setTimeCheckbox] = useState(false);
@@ -479,6 +523,7 @@ function Home({route, navigation}) {
         timeAlarm: timeCheckbox,
         date: date,
         time: time,
+        endTime: endTime,
         coordinate: marker.coordinate,
         location: resluts.data?.results[0]?.formatted_address ?? 'Unknown',
         distance: selectDistance,
@@ -687,7 +732,7 @@ function Home({route, navigation}) {
         {/* <SearchBar /> */}
         <RBSheet
           ref={rawSheetRef}
-          height={275}
+          height={300}
           openDuration={250}
           customStyles={{
             container: {
@@ -705,6 +750,8 @@ function Home({route, navigation}) {
             setDate={setDate}
             time={time}
             setTime={setTime}
+            endTime={endTime}
+            setEndTime={setEndTime}
             timeCheckbox={timeCheckbox}
             setTimeCheckbox={setTimeCheckbox}
           />
