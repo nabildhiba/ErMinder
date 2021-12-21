@@ -18,6 +18,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import colors from '../constant/colors.json';
 import {Switch} from 'react-native-switch';
 import ToggleSwitch from 'toggle-switch-react-native';
+import moment from 'moment';
 
 if (
   Platform.OS === 'android' &&
@@ -101,7 +102,7 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
             </Text>
           )}
           {data.item.timeAlarm && (
-            <Text style={styles.text}>Time Alarm: {data.item.dateTime}</Text>
+            <Text style={styles.text}>Time Alarm: {moment(data.item.dateTime).format('DD-MMM-YY, h:mm a')}</Text>
           )}
           <MaterialIcons
             onPress={deleteAlarm}
