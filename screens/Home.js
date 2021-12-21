@@ -99,7 +99,10 @@ const DistanceAlarmCard = ({
       <View style={{flex: 0.1}}>
         <AppCheckbox
           value={distanceCheckbox}
-          onValueChange={newValue => setDistanceCheckbox(newValue)}
+          onValueChange={newValue => {
+            console.log(newValue)
+            // setDistanceCheckbox(newValue)
+          }}
           style={{margin: 5}}
         />
       </View>
@@ -361,7 +364,7 @@ function Home({route, navigation}) {
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [notificationVia, setNotificationVia] = useState('App Notification');
-  const [distanceCheckbox, setDistanceCheckbox] = useState(false);
+  const [distanceCheckbox, setDistanceCheckbox] = useState(true);
   const [timeCheckbox, setTimeCheckbox] = useState(false);
   const [loading, setLoading] = useState(false);
   const alarmRef = useRef([]);
@@ -548,7 +551,7 @@ function Home({route, navigation}) {
           setLoading(false);
           setTimeCheckbox(false);
           setMarker({});
-          setDistanceCheckbox(false);
+          // setDistanceCheckbox(false);
           rawSheetRef.current.close();
           showMessage({
             message: 'Alarm have been added successfully.',
