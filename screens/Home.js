@@ -216,6 +216,7 @@ const TimeAlarmCard = ({
                 testID="dateTimePicker"
                 value={date}
                 mode={'date'}
+                minimumDate={new Date()}
                 is24Hour={true}
                 display="default"
                 onChange={onChangeDate}
@@ -427,11 +428,11 @@ function Home({route, navigation}) {
           item.coordinate.latitude,
           item.coordinate.longitude,
         );
-        const timeDifference = Math.abs(
-          differenceInMinutes(new Date(item.dateTime), new Date()),
-        );
+        // const timeDifference = Math.abs(
+        //   differenceInMinutes(new Date(item.dateTime), new Date()),
+        // );
         // console.log(4, timeDifference);
-        if (distance <= item.distance && timeDifference <= 15) {
+        if (item.time && item.endTime && distance <= item.distance && new Date() >= new Date(item.time.toDate()) && new Date() <= new Date(item.endTime.toDate())) {
           onDisplayNotification(
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
@@ -679,6 +680,7 @@ function Home({route, navigation}) {
         onPress={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
           // console.log(details.geometry.location);
+          
           const {lat: latitude, lng: longitude} = details.geometry.location;
           setRegion(prev => ({...prev, latitude, longitude}));
           mapRef.current.animateToRegion({
@@ -687,6 +689,10 @@ function Home({route, navigation}) {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           });
+          setMarker({
+            coordinate: { latitude , longitude }
+          });
+          rawSheetRef.current.open();
         }}
       />
       <TouchableOpacity
@@ -710,6 +716,7 @@ function Home({route, navigation}) {
           Geolocation.getCurrentPosition(info => {
             if (info?.coords) {
               const {coords} = info;
+              console.log('jjjj')
               mapRef.current.animateToRegion({
                 latitude: coords.latitude,
                 longitude: coords.longitude,
