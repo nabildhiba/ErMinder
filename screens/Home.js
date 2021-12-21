@@ -502,6 +502,13 @@ function Home({route, navigation}) {
     rawSheetRef.current.open();
   };
 
+  const onPoiClick = (e) => {
+    setMarker({
+      coordinate: e.nativeEvent.coordinate,
+    });
+    rawSheetRef.current.open();
+  }
+
   const onSubmit = async () => {
     if (!distanceCheckbox) {
       showMessage({
@@ -636,6 +643,7 @@ function Home({route, navigation}) {
           performOperation(e.nativeEvent.coordinate);
         }}
         onPress={onMapPress}
+        onPoiClick={onPoiClick}
         showsUserLocation
         showsMyLocationButton={false}
         // showsMyLocationButton
