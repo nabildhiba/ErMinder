@@ -30,7 +30,7 @@ import {format, differenceInMinutes, formatDistanceToNow} from 'date-fns';
 import BackgroundTimer from 'react-native-background-timer';
 import {getLocation} from '../Utils/requestLocationPermission';
 import getDistanceFromLatLon from '../Utils/getDistanceFromLatLon';
-import notifee from '@notifee/react-native';
+import notifee, { EventType } from '@notifee/react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import LinearGradient from 'react-native-linear-gradient';
@@ -379,7 +379,36 @@ function Home({route, navigation}) {
     longitudeDelta: 0.0421,
   });
 
-  async function onDisplayNotification(title, body) {
+  async function bootstrap() {
+    const initialNotification = await notifee.getInitialNotification();
+
+    if (initialNotification) {
+      console.log('-------------Notification caused application to open', initialNotification.notification);
+      console.log('-------------Press action used to open the app', initialNotification.pressAction);
+    }
+  }
+  
+  useEffect(() => {
+    return notifee.onForegroundEvent(({ type, detail }) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('----------------User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('----------------User pressed notification', detail.notification);
+          navigation.navigate('Snooze', { data: detail.notification.data })
+          break;
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    bootstrap()
+      .then(() => setLoading(false))
+      .catch(console.error);
+  }, []);
+
+  async function onDisplayNotification(title, body, data = {}) {
     // Create a channel
     const channelId = await notifee.createChannel({
       id: 'default',
@@ -391,9 +420,13 @@ function Home({route, navigation}) {
     await notifee.displayNotification({
       title,
       body,
+      data,
       android: {
         channelId,
         sound: 'default',
+        pressAction: {
+          id: 'default',
+        },
         // smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
       },
     });
@@ -425,6 +458,7 @@ function Home({route, navigation}) {
       firstTime.current = false;
     }
     alarmRef.current.forEach((item, i) => {
+      console.log('--------------',item)
       if (item.isActive && item.timeAlarm && item.distanceAlarm) {
         const distance = getDistanceFromLatLon(
           coords.latitude,
@@ -442,6 +476,7 @@ function Home({route, navigation}) {
               new Date(item.dateTime),
             )}`,
             `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
+            { id: item.id }
           );
           alarmRef.current[i].isActive = false
         }
@@ -469,6 +504,7 @@ function Home({route, navigation}) {
           onDisplayNotification(
             item.location,
             `You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
+            { id: item.id }
           );
           alarmRef.current[i].isActive = false
         }
@@ -489,6 +525,7 @@ function Home({route, navigation}) {
               new Date(item.dateTime),
             )}`,
             `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
+            { id: item.id }
           );
           alarmRef.current[i].isActive = false
         }

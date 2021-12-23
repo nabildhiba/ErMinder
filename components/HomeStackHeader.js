@@ -17,7 +17,7 @@ export const HomeStackHeader = ({navigation, route, options}) => {
           <TouchableOpacity
             style={{marginLeft: 12}}
             onPress={() => navigation.goBack()}>
-            <IIcon name="ios-chevron-back" size={28} color={colors.text} />
+            <IIcon name="ios-chevron-back" size={28} color={colors.white} />
           </TouchableOpacity>
         </View>
       );
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
   container: {
     height: 60,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.primary,
   },
 });

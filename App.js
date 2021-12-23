@@ -26,6 +26,7 @@ import ForgetPassword from './screens/ForgetPassword';
 import auth from '@react-native-firebase/auth';
 // import IIcon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from 'react-native-splash-screen'
+import Snooze from './screens/Snooze'
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,7 @@ const HomeStack = () => {
       })}
       initialRouteName={'Home'}>
       <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Snooze" component={Snooze} />
     </Stack.Navigator>
   );
 };
