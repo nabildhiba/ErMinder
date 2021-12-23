@@ -368,6 +368,7 @@ function Home({route, navigation}) {
   const [timeCheckbox, setTimeCheckbox] = useState(false);
   const [loading, setLoading] = useState(false);
   const alarmRef = useRef([]);
+  const [alarmData, setAlarmData] = useState([]);
   const firstTime = useRef(true);
   const mapRef = useRef(null);
   // console.log('currentLocation', currentLocation);
@@ -423,7 +424,7 @@ function Home({route, navigation}) {
       });
       firstTime.current = false;
     }
-    alarmRef.current.forEach(item => {
+    alarmRef.current.forEach((item, i) => {
       if (item.isActive && item.timeAlarm && item.distanceAlarm) {
         const distance = getDistanceFromLatLon(
           coords.latitude,
@@ -442,6 +443,7 @@ function Home({route, navigation}) {
             )}`,
             `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
           );
+          alarmRef.current[i].isActive = false
         }
       } else if (item.isActive && item.distanceAlarm) {
         const distance = getDistanceFromLatLon(
@@ -468,6 +470,7 @@ function Home({route, navigation}) {
             item.location,
             `You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
           );
+          alarmRef.current[i].isActive = false
         }
       } else if (item.isActive && item.timeAlarm) {
         const distance = getDistanceFromLatLon(
@@ -476,17 +479,18 @@ function Home({route, navigation}) {
           item.coordinate.latitude,
           item.coordinate.longitude,
         );
-        const timeDifference = Math.abs(
-          differenceInMinutes(new Date(item.dateTime), new Date()),
-        );
+        // const timeDifference = Math.abs(
+        //   differenceInMinutes(new Date(item.dateTime), new Date()),
+        // );
         // console.log(4, timeDifference);
-        if (distance <= 2 && timeDifference <= 15) {
+        if (distance <= 2 && item.time && item.endTime && new Date() >= new Date(item.time.toDate()) && new Date() <= new Date(item.endTime.toDate())) {
           onDisplayNotification(
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
             )}`,
             `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
           );
+          alarmRef.current[i].isActive = false
         }
       }
     });
@@ -590,43 +594,71 @@ function Home({route, navigation}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  
   useEffect(() => {
     // requestBackgroundLocationPermission();
-    if (auth()?.currentUser?.uid) {
-      // const allAlarms = [];
-      firestore()
-        .collection('Users')
-        .doc(auth().currentUser.uid)
-        .collection('Alarms')
-        .onSnapshot(doc => {
-          doc.docChanges().forEach(change => {
-            if (change.type === 'added') {
-              alarmRef.current = [
-                {...change.doc.data(), id: change.doc.id},
-                ...alarmRef.current,
-              ];
-            }
-            if (change.type === 'modified') {
-              alarmRef.current = alarmRef.current.map(item => {
-                if (item.id === change.doc.id) {
-                  return {...item, ...change.doc.data()};
-                } else {
-                  return item;
-                }
-              });
-            }
-            if (change.type === 'removed') {
-              alarmRef.current = alarmRef.current.filter(item => {
-                if (item.id === change.doc.id) {
-                  return false;
-                }
-                return true;
-              });
-            }
+    const unsubscribe = navigation.addListener('focus', e => {
+      console.log('refreshing')
+      if (auth()?.currentUser?.uid) {
+        // const allAlarms = [];
+        firestore()
+          .collection('Users')
+          .doc(auth().currentUser.uid)
+          .collection('Alarms') 
+          .onSnapshot(doc => {
+            doc.docChanges().forEach(change => {
+              if (change.type === 'added') {
+                setAlarmData(prev =>
+                  [
+                    {...change.doc.data(), id: change.doc.id},
+                    ...prev,
+                  ]
+                )
+                alarmRef.current = [
+                  {...change.doc.data(), id: change.doc.id},
+                  ...alarmRef.current,
+                ];
+              }
+              if (change.type === 'modified') {
+                setAlarmData(prev => 
+                   prev.map(item => {
+                    if (item.id === change.doc.id) {
+                      return {...item, ...change.doc.data()};
+                    } else {
+                      return item;
+                    }
+                  })
+                )
+                alarmRef.current = alarmRef.current.map(item => {
+                  if (item.id === change.doc.id) {
+                    return {...item, ...change.doc.data()};
+                  } else {
+                    return item;
+                  }
+                });
+              }
+              if (change.type === 'removed') {
+                setAlarmData(prev => 
+                  prev.filter(item => {
+                    if (item.id === change.doc.id) {
+                      return false;
+                    }
+                    return true;
+                  })
+                )
+                alarmRef.current = alarmRef.current.filter(item => {
+                  if (item.id === change.doc.id) {
+                    return false;
+                  }
+                  return true;
+                });
+              }
+            });
           });
-        });
-    }
-  }, []);
+      }  
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <>
@@ -658,7 +690,7 @@ function Home({route, navigation}) {
         {marker?.coordinate && (
           <Marker pinColor={colors.skyblue} coordinate={marker.coordinate} />
         )}
-        {alarmRef.current.map(item => {
+        {alarmData?.map(item => {
           if (!item.distanceAlarm || !item.isActive) {
             return null;
           }

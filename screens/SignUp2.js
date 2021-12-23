@@ -38,6 +38,7 @@ function ForgetPassword({navigation}) {
         const userDB = firestore().collection('Users').doc(res.user.uid);
         await userDB.set(
           {
+            fullname: data.fullname,
             email: data.user_email,
             phone: data.user_phone,
             location: data.user_location,
@@ -61,10 +62,22 @@ function ForgetPassword({navigation}) {
       .catch(error => {
         setIsLoading(false);
         const errorMessage = error.message;
-        showMessage({
-          message: errorMessage,
-          type: 'danger',
-        });
+        console.log(error.code);
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            showMessage({
+              message: 'Email already registered.',
+              type: 'danger',
+            });
+            break;
+
+          default:
+            showMessage({
+              message: errorMessage,
+              type: 'danger',
+            });
+            break;
+        }
       });
   };
 
@@ -117,10 +130,22 @@ function ForgetPassword({navigation}) {
               required: true,
             }}
             style={{width: '100%', minHeight: 55}}
+            placeholder={'Full Name'}
+            icon={<IIcon name="person" size={20} color={colors.primary} />}
+            name="fullname"
+          />
+          {errors.fullname && (
+            <Text style={styles.error}>Please enter your fullname.</Text>
+          )}
+          <CTextInput
+            autoFocus={true}
+            control={control}
+            rules={{
+              required: true,
+            }}
+            style={{width: '100%', minHeight: 55}}
             placeholder={'Email'}
-            icon={
-              <IIcon name="person-outline" size={20} color={colors.primary} />
-            }
+            icon={<IIcon name="mail" size={20} color={colors.primary} />}
             name="user_email"
           />
           {errors.user_email && (

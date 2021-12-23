@@ -104,6 +104,10 @@ function ProfileTab({navigation}) {
         <View style={styles.infoContainer}>
           {/* <InfoRow placeholder="Username" value="Justin" /> */}
           <InfoRow
+            placeholder="Full Name"
+            value={user?.isAnonymous ? 'Anonymous' : user?.fullname ?? '-'}
+          />
+          <InfoRow
             placeholder="Email"
             value={user?.isAnonymous ? 'Anonymous' : user?.email ?? '-'}
           />

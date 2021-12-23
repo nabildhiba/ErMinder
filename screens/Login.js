@@ -96,10 +96,22 @@ function Login({navigation}) {
       .catch(error => {
         const errorMessage = error.message;
         console.log(errorMessage);
-        showMessage({
-          message: errorMessage,
-          type: 'danger',
-        });
+        console.log(error.code);
+        switch (error.code) {
+          case 'auth/wrong-password':
+            showMessage({
+              message: 'Email or Password is incorrect.',
+              type: 'danger',
+            });
+            break;
+
+          default:
+            showMessage({
+              message: errorMessage,
+              type: 'danger',
+            });
+            break;
+        }
       })
       .finally(() => {
         setIsLoading(false);

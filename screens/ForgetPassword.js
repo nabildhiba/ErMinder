@@ -107,7 +107,7 @@ function ForgetPassword({navigation}) {
             name="user_email"
           />
           {errors.user_email && (
-            <Text style={styles.error}>This is required.</Text>
+            <Text style={styles.error}>Please enter your email.</Text>
           )}
 
           <View style={{flex: 1, marginTop: 30}}>
