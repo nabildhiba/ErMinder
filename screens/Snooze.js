@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, TextInput, Dimensions, View} from 'react-native';
-import MIcon from 'react-native-vector-icons/MaterialIcons';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import colors from '../constant/colors.json';
 import fontSize from '../constant/fontSize.json';
 import Button from '../components/Button';
@@ -17,6 +17,7 @@ const {width} = Dimensions.get('screen');
 const pickerData = [
   {label: '15 Minute', value: 15},
   {label: '30 Minute', value: 30},
+  {label: '45 Minute', value: 45},
   {label: '1 hour', value: 60},
   {label: '2 hour', value: 120},
   {label: '3 hour', value: 180},
@@ -122,7 +123,7 @@ const Snooze = ({route, navigation}) => {
   return (
     <View style={styles.container}>
       <View style={{alignItems: 'center'}}>
-        <MIcon name="access-alarm" size={128} color={colors.primary} />
+        <MIcon name="bell-outline" size={128} color={colors.primary} />
         {snooze && (
           <>
             <View style={styles.picker}>
