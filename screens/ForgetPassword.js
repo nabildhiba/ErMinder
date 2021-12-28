@@ -27,7 +27,7 @@ function ForgetPassword({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async data => {
-    console.log(data);
+    // console.log(data);
     setIsLoading(true);
     auth()
       .sendPasswordResetEmail(data.user_email)

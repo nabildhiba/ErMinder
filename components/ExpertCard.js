@@ -20,7 +20,7 @@ function ExpertCard({
   expert_in,
   ...rest
 }) {
-  console.log('profilePic', profilePic);
+  // console.log('profilePic', profilePic);
   return (
     <TouchableOpacity
       {...rest}

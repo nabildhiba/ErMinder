@@ -81,7 +81,7 @@ function Login({navigation}) {
   }, []);
 
   const onSubmit = async data => {
-    console.log(data);
+    // console.log(data);
     setIsLoading(true);
     auth()
       .signInWithEmailAndPassword(data.user_name, data.user_password)

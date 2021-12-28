@@ -41,7 +41,7 @@ function ProfileTab({navigation}) {
         .get()
         .then(doc => {
           if (doc.exists) {
-            console.log('Document data:', doc.data());
+            // console.log('Document data:', doc.data());
             setUser(prev => ({...prev, ...doc.data()}));
           } else {
             // doc.data() will be undefined in this case

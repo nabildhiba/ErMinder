@@ -157,6 +157,7 @@ function AlarmTab({navigation}) {
         .doc(auth().currentUser.uid)
         .collection('Alarms')
         .onSnapshot(doc => {
+          console.log(doc);
           doc.docChanges().forEach(change => {
             if (change.type === 'added') {
               LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);

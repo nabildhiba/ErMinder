@@ -8,7 +8,7 @@ const {width} = Dimensions.get('screen');
 export default function SearchBar({onPress}) {
   const [text, onChangeText] = React.useState('');
   const autoCompleteRef = useRef();
-  console.log(text);
+  // console.log(text);
   return (
     <View style={styles.container}>
       <GooglePlacesAutocomplete

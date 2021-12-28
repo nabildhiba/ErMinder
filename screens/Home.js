@@ -100,7 +100,7 @@ const DistanceAlarmCard = ({
         <AppCheckbox
           value={distanceCheckbox}
           onValueChange={newValue => {
-            console.log(newValue)
+            // console.log(newValue)
             // setDistanceCheckbox(newValue)
           }}
           style={{margin: 5}}
@@ -458,7 +458,7 @@ function Home({route, navigation}) {
       firstTime.current = false;
     }
     alarmRef.current.forEach((item, i) => {
-      console.log('--------------',item)
+      // console.log('--------------',item)
       if (item.isActive && item.timeAlarm && item.distanceAlarm) {
         const distance = getDistanceFromLatLon(
           coords.latitude,
@@ -643,6 +643,7 @@ function Home({route, navigation}) {
           .doc(auth().currentUser.uid)
           .collection('Alarms') 
           .onSnapshot(doc => {
+            if(!doc) return;
             doc.docChanges().forEach(change => {
               if (change.type === 'added') {
                 setAlarmData(prev =>
