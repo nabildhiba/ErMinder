@@ -362,7 +362,7 @@ const SubmitButton = ({onPress = () => null}) => {
 function Home({route, navigation}) {
   const [marker, setMarker] = useState(null);
   const rawSheetRef = useRef(null);
-  const [selectDistance, setSelectDistance] = useState(2);
+  const [selectDistance, setSelectDistance] = useState(milesArray[0]);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
