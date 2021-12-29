@@ -81,13 +81,21 @@ const Snooze = ({route, navigation}) => {
       })
       .finally(() => {
         setUpateLoading(false);
-        navigation.goBack();
+        // navigation.goBack();
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Home'}],
+        });
       });
   };
 
   const getData = async () => {
     if (!data_id) {
-      navigation.goBack();
+      // navigation.goBack();
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Home'}],
+      });
     }
     firestore()
       .collection('Users')
@@ -206,7 +214,11 @@ const Snooze = ({route, navigation}) => {
             text={'Thank You'}
             style={{marginRight: 10, flex: 1}}
             onPress={() => {
-              navigation.goBack();
+              // navigation.goBack();
+              navigation.reset({
+                index: 0,
+                routes: [{name: 'Home'}],
+              });
             }}
           />
           {snooze ? (

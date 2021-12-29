@@ -393,6 +393,7 @@ function Home({route, navigation}) {
 
     // Display a notification
     await notifee.displayNotification({
+      id: data.id,
       title,
       body,
       data: {...data, link: 'erminder://Snooze'},
