@@ -24,7 +24,7 @@ import AlarmTab from './screens/AlarmTab';
 import ProfileTab from './screens/ProfileTab';
 import {MoreStackHeader} from './components/MoreStackHeader';
 import ForgetPassword from './screens/ForgetPassword';
-import notifee from '@notifee/react-native';
+import notifee, {EventType} from '@notifee/react-native';
 import auth from '@react-native-firebase/auth';
 // import IIcon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from 'react-native-splash-screen';
@@ -150,10 +150,51 @@ const linking = {
     // Get deep link from data
     // if this is undefined, the app will open the default/home page
     if (message?.notification?.data?.link) {
-      console.log(121213213, `${message?.notification?.data?.link}?data_id=${message?.notification?.data?.id}`);
       return `${message?.notification?.data?.link}?data_id=${message?.notification?.data?.id}`;
     }
     return message?.notification?.data?.link;
+  },
+  subscribe(listener) {
+    const onReceiveURL = ({url}) => listener(url);
+
+    // Listen to incoming links from deep linking
+    const listen = Linking.addEventListener('url', onReceiveURL);
+
+    // Listen to firebase push notifications
+    const unsubscribeBGNotification = notifee.onBackgroundEvent(
+      ({type, detail}) => {
+        switch (type) {
+          case EventType.PRESS:
+            listener(
+              `erminder://Snooze?data_id=${detail.notification.data.id}`,
+            );
+            break;
+          default:
+            break;
+        }
+      },
+    );
+
+    const unsubscribeFGNotification = notifee.onForegroundEvent(
+      ({type, detail}) => {
+        switch (type) {
+          case EventType.PRESS:
+            listener(
+              `erminder://Snooze?data_id=${detail.notification.data.id}`,
+            );
+            break;
+          default:
+            break;
+        }
+      },
+    );
+
+    return () => {
+      // Clean up the event listeners
+      listen.remove();
+      unsubscribeBGNotification();
+      unsubscribeFGNotification();
+    };
   },
 };
 
@@ -167,7 +208,6 @@ const App = () => {
         SplashScreen.hide();
         setInitialRoute('LoginNavigation');
         setIsReady(true);
-
       } else {
         SplashScreen.hide();
         setInitialRoute('HomeNavigation');

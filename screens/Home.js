@@ -382,66 +382,6 @@ function Home({route, navigation}) {
     longitudeDelta: 0.0421,
   });
 
-  async function bootstrap() {
-    const initialNotification = await notifee.getInitialNotification();
-
-    if (initialNotification) {
-      console.log(
-        '-------------Notification caused application to open',
-        initialNotification.notification,
-      );
-      console.log(
-        '-------------Press action used to open the app',
-        initialNotification.pressAction,
-      );
-    }
-  }
-
-  // useEffect(() => {
-  //   return notifee.onBackgroundEvent(({type, detail}) => {
-  //     switch (type) {
-  //       case EventType.DISMISSED:
-  //         console.log(
-  //           '----------------User dismissed notification',
-  //           detail.notification,
-  //         );
-  //         break;
-  //       case EventType.ACTION_PRESS:
-  //         console.log(
-  //           '----------------User pressed notification',
-  //           detail.notification,
-  //         );
-  //         navigation.navigate('Snooze', {data: detail.notification.data});
-  //         break;
-  //     }
-  //   });
-  // }, []);
-
-  useEffect(() => {
-    return notifee.onForegroundEvent(({type, detail}) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          console.log(
-            '----------------User dismissed notification',
-            detail.notification,
-          );
-          break;
-        case EventType.PRESS:
-          console.log(
-            '----------------User pressed notification',
-            detail.notification,
-          );
-          navigation.navigate('Snooze', {data_id: detail.notification.data.id});
-          break;
-      }
-    });
-  }, []);
-
-  // useEffect(() => {
-  //   bootstrap()
-  //     .then(() => setLoading(false))
-  //     .catch(console.error);
-  // }, []);
 
   async function onDisplayNotification(title, body, data = {}) {
     // Create a channel
