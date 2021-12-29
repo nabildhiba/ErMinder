@@ -135,7 +135,7 @@ function ForgetPassword({navigation}) {
             name="fullname"
           />
           {errors.fullname && (
-            <Text style={styles.error}>Please enter your fullname.</Text>
+            <Text style={styles.error}>Please enter your full name.</Text>
           )}
           <CTextInput
             autoFocus={true}
