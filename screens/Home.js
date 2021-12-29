@@ -382,7 +382,6 @@ function Home({route, navigation}) {
     longitudeDelta: 0.0421,
   });
 
-
   async function onDisplayNotification(title, body, data = {}) {
     // Create a channel
     const channelId = await notifee.createChannel({
@@ -403,6 +402,8 @@ function Home({route, navigation}) {
         pressAction: {
           id: 'default',
         },
+        showTimestamp: true,
+        timestamp: new Date() - 3600,
         // smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
       },
     });
