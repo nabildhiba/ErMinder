@@ -57,7 +57,7 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
     setIsEnabled(data.item.isActive);
   }, [data.item.isActive]);
 
-  console.log(data.item);
+  // console.log(data.item);
   if (!data.item.timeAlarm && !data.item.distanceAlarm) {
     return null;
   }
@@ -157,7 +157,7 @@ function AlarmTab({navigation}) {
         .doc(auth().currentUser.uid)
         .collection('Alarms')
         .onSnapshot(doc => {
-          console.log(doc);
+          // console.log(doc);
           doc.docChanges().forEach(change => {
             if (change.type === 'added') {
               LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);

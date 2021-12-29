@@ -36,7 +36,9 @@ const Snooze = ({route, navigation}) => {
   const [alarmData, setAlarmData] = useState(false);
   const [upateLoading, setUpateLoading] = useState(false);
   const [customHour, setCustomHour] = useState('');
-  const {data} = route.params;
+  // const {data} = route.params;
+  const data_id = route?.params?.data_id;
+  console.log('data_id', data_id);
 
   const onChangeTime = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -71,7 +73,7 @@ const Snooze = ({route, navigation}) => {
       .collection('Users')
       .doc(auth().currentUser.uid)
       .collection('Alarms')
-      .doc(data.id)
+      .doc(data_id)
       .update({
         dateTime: new Date(dateTime).toString(),
         time: new Date(time),
@@ -84,14 +86,14 @@ const Snooze = ({route, navigation}) => {
   };
 
   const getData = async () => {
-    if (!data) {
+    if (!data_id) {
       navigation.goBack();
     }
     firestore()
       .collection('Users')
       .doc(auth().currentUser.uid)
       .collection('Alarms')
-      .doc(data.id)
+      .doc(data_id)
       .get()
       .then(doc => {
         if (doc.exists) {

@@ -1,21 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  ActivityIndicator,
   View,
-  Dimensions,
   StyleSheet,
   TouchableOpacity,
   Platform,
   Alert,
-  Permissi,
   PermissionsAndroid,
 } from 'react-native';
-import QuestionsCard from '../components/QuestionsCard';
-import SearchBox from '../components/SearchBox';
 import {Text} from '../components/Text';
 import colors from '../constant/colors.json';
-import EncryptedStorage from 'react-native-encrypted-storage';
-import fontSize from '../constant/fontSize.json';
 import {showMessage} from 'react-native-flash-message';
 import SearchBar from '../components/SearchBar';
 import AppCheckbox from '../components/AppCheckbox';
@@ -26,32 +19,34 @@ import {Picker} from '@react-native-picker/picker';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {format, differenceInMinutes, formatDistanceToNow} from 'date-fns';
+import {format, formatDistanceToNow} from 'date-fns';
 import BackgroundTimer from 'react-native-background-timer';
 import {getLocation} from '../Utils/requestLocationPermission';
 import getDistanceFromLatLon from '../Utils/getDistanceFromLatLon';
-import notifee, { EventType } from '@notifee/react-native';
+import notifee, {EventType} from '@notifee/react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
-import moment from 'moment'
+import moment from 'moment';
 
-const milesArray = [0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769];
+const milesArray = [
+  0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
+];
 
-notifee.onBackgroundEvent(async ({type, detail}) => {
-  // const {notification, pressAction} = detail;
-  // Check if the user pressed the "Mark as read" action
-  // if (type === EventType.ACTION_PRESS && pressAction.id === 'mark-as-read') {
-  //   // Update external API
-  //   await fetch(`https://my-api.com/chat/${notification.data.chatId}/read`, {
-  //     method: 'POST',
-  //   });
-  //   // Remove the notification
-  //   await notifee.cancelNotification(notification.id);
-  // }
-});
+// notifee.onBackgroundEvent(async ({type, detail}) => {
+//   // const {notification, pressAction} = detail;
+//   // Check if the user pressed the "Mark as read" action
+//   // if (type === EventType.ACTION_PRESS && pressAction.id === 'mark-as-read') {
+//   //   // Update external API
+//   //   await fetch(`https://my-api.com/chat/${notification.data.chatId}/read`, {
+//   //     method: 'POST',
+//   //   });
+//   //   // Remove the notification
+//   //   await notifee.cancelNotification(notification.id);
+//   // }
+// });
 
 const requestBackgroundLocationPermission = async () => {
   try {
@@ -117,7 +112,9 @@ const DistanceAlarmCard = ({
           <TouchableOpacity
             onPress={() => pickerRef.current.focus()}
             style={{flexDirection: 'row'}}>
-            <Text style={styles.text}>{`${Math.round(selectDistance * 1609.344)} meter(s)`}</Text>
+            <Text style={styles.text}>{`${Math.round(
+              selectDistance * 1609.344,
+            )} meter(s)`}</Text>
             <IIcon
               name="chevron-down"
               size={20}
@@ -131,7 +128,13 @@ const DistanceAlarmCard = ({
               selectedValue={selectDistance}
               onValueChange={itemValue => setSelectDistance(itemValue)}>
               {milesArray.map(item => {
-                return <Picker.Item label={`${Math.round(item * 1609.344)} meter(s)`} value={item} />;
+                return (
+                  <Picker.Item
+                    key={`${Math.round(item * 1609.344)} meter(s)`}
+                    label={`${Math.round(item * 1609.344)} meter(s)`}
+                    value={item}
+                  />
+                );
               })}
             </Picker>
           </TouchableOpacity>
@@ -149,7 +152,7 @@ const TimeAlarmCard = ({
   endTime,
   timeCheckbox,
   setTimeCheckbox,
-  setEndTime
+  setEndTime,
 }) => {
   // const [date, setDate] = useState(new Date());
   // const [time, setTime] = useState(new Date());
@@ -168,13 +171,13 @@ const TimeAlarmCard = ({
   };
 
   const onChangeEndTime = (event, selectedDate) => {
-    if(moment(time).diff(selectedDate, 'minutes') > 0) {
+    if (moment(time).diff(selectedDate, 'minutes') > 0) {
       setShowEndTime(Platform.OS === 'ios');
       showMessage({
         message: 'End Time can not be less then start time',
         type: 'danger',
       });
-      return
+      return;
     }
     const currentDate = selectedDate || date;
     setShowEndTime(Platform.OS === 'ios');
@@ -383,30 +386,62 @@ function Home({route, navigation}) {
     const initialNotification = await notifee.getInitialNotification();
 
     if (initialNotification) {
-      console.log('-------------Notification caused application to open', initialNotification.notification);
-      console.log('-------------Press action used to open the app', initialNotification.pressAction);
+      console.log(
+        '-------------Notification caused application to open',
+        initialNotification.notification,
+      );
+      console.log(
+        '-------------Press action used to open the app',
+        initialNotification.pressAction,
+      );
     }
   }
-  
+
+  // useEffect(() => {
+  //   return notifee.onBackgroundEvent(({type, detail}) => {
+  //     switch (type) {
+  //       case EventType.DISMISSED:
+  //         console.log(
+  //           '----------------User dismissed notification',
+  //           detail.notification,
+  //         );
+  //         break;
+  //       case EventType.ACTION_PRESS:
+  //         console.log(
+  //           '----------------User pressed notification',
+  //           detail.notification,
+  //         );
+  //         navigation.navigate('Snooze', {data: detail.notification.data});
+  //         break;
+  //     }
+  //   });
+  // }, []);
+
   useEffect(() => {
-    return notifee.onForegroundEvent(({ type, detail }) => {
+    return notifee.onForegroundEvent(({type, detail}) => {
       switch (type) {
         case EventType.DISMISSED:
-          console.log('----------------User dismissed notification', detail.notification);
+          console.log(
+            '----------------User dismissed notification',
+            detail.notification,
+          );
           break;
         case EventType.PRESS:
-          console.log('----------------User pressed notification', detail.notification);
-          navigation.navigate('Snooze', { data: detail.notification.data })
+          console.log(
+            '----------------User pressed notification',
+            detail.notification,
+          );
+          navigation.navigate('Snooze', {data_id: detail.notification.data.id});
           break;
       }
     });
   }, []);
 
-  useEffect(() => {
-    bootstrap()
-      .then(() => setLoading(false))
-      .catch(console.error);
-  }, []);
+  // useEffect(() => {
+  //   bootstrap()
+  //     .then(() => setLoading(false))
+  //     .catch(console.error);
+  // }, []);
 
   async function onDisplayNotification(title, body, data = {}) {
     // Create a channel
@@ -420,7 +455,7 @@ function Home({route, navigation}) {
     await notifee.displayNotification({
       title,
       body,
-      data,
+      data: {...data, link: 'erminder://Snooze'},
       android: {
         channelId,
         sound: 'default',
@@ -470,15 +505,23 @@ function Home({route, navigation}) {
         //   differenceInMinutes(new Date(item.dateTime), new Date()),
         // );
         // console.log(4, timeDifference);
-        if (item.time && item.endTime && distance <= item.distance && new Date() >= new Date(item.time.toDate()) && new Date() <= new Date(item.endTime.toDate())) {
+        if (
+          item.time &&
+          item.endTime &&
+          distance <= item.distance &&
+          new Date() >= new Date(item.time.toDate()) &&
+          new Date() <= new Date(item.endTime.toDate())
+        ) {
           onDisplayNotification(
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
             )}`,
-            `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
-            { id: item.id }
+            `2 You are ${Math.round(distance * 1609.344)} meters away from ${
+              item.location
+            }`,
+            {id: item.id},
           );
-          alarmRef.current[i].isActive = false
+          alarmRef.current[i].isActive = false;
         }
       } else if (item.isActive && item.distanceAlarm) {
         const distance = getDistanceFromLatLon(
@@ -503,10 +546,12 @@ function Home({route, navigation}) {
           }
           onDisplayNotification(
             item.location,
-            `You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
-            { id: item.id }
+            `You are ${Math.round(distance * 1609.344)} meters away from ${
+              item.location
+            }`,
+            {id: item.id},
           );
-          alarmRef.current[i].isActive = false
+          alarmRef.current[i].isActive = false;
         }
       } else if (item.isActive && item.timeAlarm) {
         const distance = getDistanceFromLatLon(
@@ -519,15 +564,23 @@ function Home({route, navigation}) {
         //   differenceInMinutes(new Date(item.dateTime), new Date()),
         // );
         // console.log(4, timeDifference);
-        if (distance <= 2 && item.time && item.endTime && new Date() >= new Date(item.time.toDate()) && new Date() <= new Date(item.endTime.toDate())) {
+        if (
+          distance <= 2 &&
+          item.time &&
+          item.endTime &&
+          new Date() >= new Date(item.time.toDate()) &&
+          new Date() <= new Date(item.endTime.toDate())
+        ) {
           onDisplayNotification(
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
             )}`,
-            `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location}`,
-            { id: item.id }
+            `2 You are ${Math.round(distance * 1609.344)} meters away from ${
+              item.location
+            }`,
+            {id: item.id},
           );
-          alarmRef.current[i].isActive = false
+          alarmRef.current[i].isActive = false;
         }
       }
     });
@@ -546,12 +599,12 @@ function Home({route, navigation}) {
     rawSheetRef.current.open();
   };
 
-  const onPoiClick = (e) => {
+  const onPoiClick = e => {
     setMarker({
       coordinate: e.nativeEvent.coordinate,
     });
     rawSheetRef.current.open();
-  }
+  };
 
   const onSubmit = async () => {
     if (!distanceCheckbox) {
@@ -631,42 +684,39 @@ function Home({route, navigation}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  
   useEffect(() => {
     // requestBackgroundLocationPermission();
     const unsubscribe = navigation.addListener('focus', e => {
-      console.log('refreshing')
+      console.log('refreshing');
       if (auth()?.currentUser?.uid) {
         // const allAlarms = [];
         firestore()
           .collection('Users')
           .doc(auth().currentUser.uid)
-          .collection('Alarms') 
+          .collection('Alarms')
           .onSnapshot(doc => {
-            if(!doc) return;
+            if (!doc) return;
             doc.docChanges().forEach(change => {
               if (change.type === 'added') {
-                setAlarmData(prev =>
-                  [
-                    {...change.doc.data(), id: change.doc.id},
-                    ...prev,
-                  ]
-                )
+                setAlarmData(prev => [
+                  {...change.doc.data(), id: change.doc.id},
+                  ...prev,
+                ]);
                 alarmRef.current = [
                   {...change.doc.data(), id: change.doc.id},
                   ...alarmRef.current,
                 ];
               }
               if (change.type === 'modified') {
-                setAlarmData(prev => 
-                   prev.map(item => {
+                setAlarmData(prev =>
+                  prev.map(item => {
                     if (item.id === change.doc.id) {
                       return {...item, ...change.doc.data()};
                     } else {
                       return item;
                     }
-                  })
-                )
+                  }),
+                );
                 alarmRef.current = alarmRef.current.map(item => {
                   if (item.id === change.doc.id) {
                     return {...item, ...change.doc.data()};
@@ -676,14 +726,14 @@ function Home({route, navigation}) {
                 });
               }
               if (change.type === 'removed') {
-                setAlarmData(prev => 
+                setAlarmData(prev =>
                   prev.filter(item => {
                     if (item.id === change.doc.id) {
                       return false;
                     }
                     return true;
-                  })
-                )
+                  }),
+                );
                 alarmRef.current = alarmRef.current.filter(item => {
                   if (item.id === change.doc.id) {
                     return false;
@@ -693,7 +743,7 @@ function Home({route, navigation}) {
               }
             });
           });
-      }  
+      }
     });
     return unsubscribe;
   }, [navigation]);
@@ -734,7 +784,7 @@ function Home({route, navigation}) {
           }
           // return null;
           return (
-            <>
+            <React.Fragment key={item.id}>
               <Circle
                 center={{
                   latitude: item.coordinate.latitude,
@@ -753,7 +803,7 @@ function Home({route, navigation}) {
                   longitude: item.coordinate.longitude,
                 }}
               />
-            </>
+            </React.Fragment>
           );
         })}
       </MapView>
@@ -761,7 +811,7 @@ function Home({route, navigation}) {
         onPress={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
           // console.log(details.geometry.location);
-          
+
           const {lat: latitude, lng: longitude} = details.geometry.location;
           setRegion(prev => ({...prev, latitude, longitude}));
           mapRef.current.animateToRegion({
@@ -771,7 +821,7 @@ function Home({route, navigation}) {
             longitudeDelta: 0.0421,
           });
           setMarker({
-            coordinate: { latitude , longitude }
+            coordinate: {latitude, longitude},
           });
           rawSheetRef.current.open();
         }}
@@ -794,18 +844,27 @@ function Home({route, navigation}) {
           elevation: 10,
         }}
         onPress={() => {
-          Geolocation.getCurrentPosition(info => {
-            if (info?.coords) {
-              const {coords} = info;
-              console.log('jjjj')
-              mapRef.current.animateToRegion({
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              });
-            }
-          });
+          Geolocation.getCurrentPosition(
+            info => {
+              if (info?.coords) {
+                const {coords} = info;
+                console.log('jjjj');
+                mapRef.current.animateToRegion({
+                  latitude: coords.latitude,
+                  longitude: coords.longitude,
+                  latitudeDelta: 0.0922,
+                  longitudeDelta: 0.0421,
+                });
+              }
+            },
+            err => {
+              console.log(err?.message);
+              Alert.alert(
+                err?.message ? err?.message : 'Alert',
+                'Please make sure that location is turned on an app have permission.',
+              );
+            },
+          );
         }}>
         <MaterialIcons name="my-location" size={25} color={colors.gray} />
       </TouchableOpacity>

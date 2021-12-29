@@ -5,6 +5,7 @@ import {
   StyleSheet,
   View,
   Text,
+  Linking,
   // TouchableOpacity,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -23,10 +24,11 @@ import AlarmTab from './screens/AlarmTab';
 import ProfileTab from './screens/ProfileTab';
 import {MoreStackHeader} from './components/MoreStackHeader';
 import ForgetPassword from './screens/ForgetPassword';
+import notifee from '@notifee/react-native';
 import auth from '@react-native-firebase/auth';
 // import IIcon from 'react-native-vector-icons/Ionicons';
-import SplashScreen from 'react-native-splash-screen'
-import Snooze from './screens/Snooze'
+import SplashScreen from 'react-native-splash-screen';
+import Snooze from './screens/Snooze';
 
 const Stack = createNativeStackNavigator();
 
@@ -114,6 +116,47 @@ const HomeNavigation = () => (
   </Tab.Navigator>
 );
 
+const deepLinksConf = {
+  screens: {
+    HomeNavigation: {
+      initialRouteName: 'LocationTab',
+      screens: {
+        AlarmTab: 'AlarmTab',
+        LocationTab: {
+          screens: {
+            initialRouteName: 'Home',
+            Snooze: 'Snooze',
+          },
+        },
+      },
+    },
+  },
+};
+
+const linking = {
+  prefixes: ['erminder://', 'https://erminder.com'],
+  config: deepLinksConf,
+  async getInitialURL() {
+    // Check if app was opened from a deep link
+    const url = await Linking.getInitialURL();
+
+    if (url != null) {
+      return url;
+    }
+
+    // Check if there is an initial firebase notification
+    const message = await notifee.getInitialNotification();
+
+    // Get deep link from data
+    // if this is undefined, the app will open the default/home page
+    if (message?.notification?.data?.link) {
+      console.log(121213213, `${message?.notification?.data?.link}?data_id=${message?.notification?.data?.id}`);
+      return `${message?.notification?.data?.link}?data_id=${message?.notification?.data?.id}`;
+    }
+    return message?.notification?.data?.link;
+  },
+};
+
 const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [initialRoute, setInitialRoute] = useState('');
@@ -138,7 +181,7 @@ const App = () => {
   ) : (
     <>
       <SafeAreaView style={styles.container}>
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
           <Stack.Navigator
             screenOptions={{header: () => null}}
             initialRouteName={initialRoute}>
