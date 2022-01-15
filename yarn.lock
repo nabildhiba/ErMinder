@@ -1363,6 +1363,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@supersami/rn-foreground-service@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@supersami/rn-foreground-service/-/rn-foreground-service-1.1.1.tgz#9afd61e73b227339b8e2573019fc81e45278bb59"
+  integrity sha512-aSpH4Obpv8FNfbpMbQZwUM00f2Gd2p5DlCBXlUg0qvx2Fon/cK+sy7YfHr4ktCGbudItEhaeV3AN/EmI8Cv+Kg==
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -4733,7 +4738,7 @@ lodash.throttle@^4.1.1:
   resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
   integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
 
-lodash@^4.17.10, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.7.0:
+lodash@^4.17.10, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.21, lodash@^4.7.0:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -5177,7 +5182,7 @@ mockdate@^3.0.2:
   resolved "https://registry.yarnpkg.com/mockdate/-/mockdate-3.0.5.tgz#789be686deb3149e7df2b663d2bc4392bc3284fb"
   integrity sha512-iniQP4rj1FhBdBYS/+eQv7j1tadJ9lJtdzgOpvsOHng/GbcDh2Fhdeq+ZRldrPYdXvCyfFUmFeEwEGXZB5I/AQ==
 
-moment@^2.27.0, moment@^2.29.1:
+moment@^2.29.1:
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
@@ -5875,14 +5880,6 @@ react-native-codegen@^0.0.7:
     jscodeshift "^0.11.0"
     nullthrows "^1.1.1"
 
-react-native-daterange-picker@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/react-native-daterange-picker/-/react-native-daterange-picker-1.5.1.tgz#3f180e14c0c8089dd6fa88048ddee6d02d8abf29"
-  integrity sha512-Oq02ApRw4XTIo1Hyw3R5vKm7zyntRSqBvmOzlzXDUxS7K9GLstvTD8U3asj23ZmAGy6OR+Ye5mghnUpJoIrjfw==
-  dependencies:
-    lodash "^4.17.19"
-    moment "^2.27.0"
-
 react-native-encrypted-storage@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.2.tgz#c7d59b1d3ff2f80d572be3e85aaab3fdee16744a"
@@ -5935,6 +5932,11 @@ react-native-linear-gradient@^2.5.6:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
   integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
+
+react-native-location@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-location/-/react-native-location-2.5.0.tgz#b6d2f7e9c3dbe13fbe87587f9533b8bf943b6a35"
+  integrity sha512-myT54tZuFmN6d5RruMVfoa8eY+voJWkSd73xUVhjzJDnQr5uu5MFoH7hMg3trHF1CAkaY/2gIneOspUdGxv59Q==
 
 react-native-maps@^0.29.4:
   version "0.29.4"

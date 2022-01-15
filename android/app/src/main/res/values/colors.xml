@@ -4,4 +4,8 @@
     <color name="status_bar_color">#3e95be</color>
     <color name="colorPrimary">#3e95be</color>
     <color name="colorAccent">#000</color>
+    <item  name="blue"  type="color">#00C4D1</item>
+    <integer-array  name="androidcolors">
+        <item>@color/blue</item>
+    </integer-array>
 </resources>

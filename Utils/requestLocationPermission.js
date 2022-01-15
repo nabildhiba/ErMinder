@@ -67,6 +67,12 @@ const hasLocationPermission = async () => {
 
   const status = await PermissionsAndroid.request(
     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    {
+      title: 'RNbgLocation Permission',
+      message: 'RNbgLocation needs to access your location in order to work',
+      buttonNegative: 'Cancel',
+      buttonPositive: 'OK',
+    },
   );
 
   if (status === PermissionsAndroid.RESULTS.GRANTED) {

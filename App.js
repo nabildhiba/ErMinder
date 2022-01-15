@@ -1,11 +1,12 @@
 // import SplashScreen from 'react-native-splash-screen';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
   View,
   Text,
   Linking,
+  AppState,
   // TouchableOpacity,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -29,6 +30,7 @@ import auth from '@react-native-firebase/auth';
 // import IIcon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from 'react-native-splash-screen';
 import Snooze from './screens/Snooze';
+import {finalCheck} from './Utils/getLocationPermission';
 
 const Stack = createNativeStackNavigator();
 
@@ -160,21 +162,6 @@ const linking = {
     // Listen to incoming links from deep linking
     const listen = Linking.addEventListener('url', onReceiveURL);
 
-    // Listen to firebase push notifications
-    const unsubscribeBGNotification = notifee.onBackgroundEvent(
-      ({type, detail}) => {
-        switch (type) {
-          case EventType.PRESS:
-            listener(
-              `erminder://Snooze?data_id=${detail.notification.data.id}`,
-            );
-            break;
-          default:
-            break;
-        }
-      },
-    );
-
     const unsubscribeFGNotification = notifee.onForegroundEvent(
       ({type, detail}) => {
         switch (type) {
@@ -192,7 +179,6 @@ const linking = {
     return () => {
       // Clean up the event listeners
       listen.remove();
-      unsubscribeBGNotification();
       unsubscribeFGNotification();
     };
   },
@@ -201,6 +187,8 @@ const linking = {
 const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [initialRoute, setInitialRoute] = useState('');
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
   useEffect(() => {
     (async () => {
       let userData = auth().currentUser;
@@ -214,6 +202,35 @@ const App = () => {
         setIsReady(true);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    if (isReady === true) {
+      console.log('000000000000000000000');
+      finalCheck();
+    }
+  }, [isReady]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        console.log('App has come to the foreground!');
+        Linking.getInitialURL().then(url => {
+          console.log(url);
+        });
+      }
+
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+      console.log('AppState', appState.current);
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   return !isReady ? (

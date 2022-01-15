@@ -56,18 +56,16 @@ const Snooze = ({route, navigation}) => {
       return;
     }
     setUpateLoading(true);
-    let time = moment(new Date(alarmData.time.toDate())).add(
-      selectedPickerValue === 'Custom' ? customHour : selectedPickerValue,
-      selectedPickerValue === 'Custom' ? 'hours' : 'minutes',
-    );
-    let endTime = moment(new Date(alarmData.endTime.toDate())).add(
-      selectedPickerValue === 'Custom' ? customHour : selectedPickerValue,
-      selectedPickerValue === 'Custom' ? 'hours' : 'minutes',
-    );
-    let dateTime = moment(new Date(alarmData.dateTime)).add(
-      selectedPickerValue === 'Custom' ? customHour : selectedPickerValue,
-      selectedPickerValue === 'Custom' ? 'hours' : 'minutes',
-    );
+    const snoozeTime =
+      selectedPickerValue === 'Custom'
+        ? customHour
+        : selectedPickerValue + selectedPickerValue === 'Custom'
+        ? 'hours'
+        : 'minutes';
+
+    let time = moment(new Date(alarmData.time.toDate())).add(snoozeTime);
+    let endTime = moment(new Date(alarmData.endTime.toDate())).add(snoozeTime);
+    let dateTime = moment(new Date(alarmData.dateTime)).add(snoozeTime);
     console.log(time, endTime);
     firestore()
       .collection('Users')
@@ -78,6 +76,7 @@ const Snooze = ({route, navigation}) => {
         dateTime: new Date(dateTime).toString(),
         time: new Date(time),
         endTime: new Date(endTime),
+        snoozeTime,
       })
       .finally(() => {
         setUpateLoading(false);
@@ -229,7 +228,7 @@ const Snooze = ({route, navigation}) => {
                 borderWidth: 2,
                 borderColor: colors.primary,
                 marginLeft: 10,
-                flex: 1
+                flex: 1,
               }}
               indicatorColor={colors.primary}
               isLoading={upateLoading}
@@ -244,7 +243,7 @@ const Snooze = ({route, navigation}) => {
                 borderWidth: 2,
                 borderColor: colors.primary,
                 marginLeft: 10,
-                flex: 1
+                flex: 1,
               }}
               textStyle={{color: colors.primary}}
               onPress={() => setSnooze(true)}

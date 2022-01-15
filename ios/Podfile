@@ -16,6 +16,8 @@ target 'Alarm' do
 
   pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
 
+  pod 'react-native-location', :path => '../node_modules/react-native-location'
+
   target 'AlarmTests' do
     inherit! :complete
     # Pods for testing
