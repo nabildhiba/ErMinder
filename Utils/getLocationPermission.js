@@ -58,7 +58,7 @@ export const checkLocationPermissionsBelow30 = async () => {
 
 export const requestLocationPermissionBelow30 = async () => {
   try {
-    const granted = await PermissionsAndroid.requestMultiple(
+    const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       {
         title: 'RNbgLocation Permission',
@@ -81,9 +81,29 @@ export const requestLocationPermissionBelow30 = async () => {
   }
 };
 
-export const finalCheck = () => {
+export const checkBackgroundPermission = () => {
   return new Promise((resolve, reject) => {
     if (Platform.Version >= 30) {
+      requestLocationPermission30Plus().then(res2 => {
+        if (!res2) {
+          reject();
+        }
+        resolve();
+      });
+    } else {
+      checkLocationPermissionsBelow30().then(res => {
+        if (!res) {
+          reject();
+        }
+        resolve();
+      });
+    }
+  });
+};
+
+export const finalCheck = () => {
+  return new Promise((resolve, reject) => {
+    if (Platform.Version >= 30 && false) {
       requestLocationPermission30Plus().then(res2 => {
         if (!res2) {
           reject();

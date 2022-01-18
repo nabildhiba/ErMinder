@@ -98,11 +98,21 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
           </View>
           {data.item.distanceAlarm && (
             <Text style={styles.text}>
-              Distance Alarm: {`${Math.round(data.item.distance * 1609.344)} meter`}
+              Distance Alarm:{' '}
+              {`${Math.round(data.item.distance * 1609.344)} meter`}
             </Text>
           )}
           {data.item.timeAlarm && (
-            <Text style={styles.text}>Time Alarm: {moment(data.item.dateTime).format('DD-MMM-YY, h:mm a')}</Text>
+            <Text style={styles.text}>
+              Time Alarm:{' '}
+              {moment(data.item.dateTime).format('DD-MMM-YY, h:mm a')}
+            </Text>
+          )}
+          {data.item?.snoozeTime && (
+            <Text style={[styles.text]}>
+              Snoozed until:{' '}
+              {moment(data.item.snoozeTime).format('DD-MMM-YY, h:mm a')}
+            </Text>
           )}
           <MaterialIcons
             onPress={deleteAlarm}

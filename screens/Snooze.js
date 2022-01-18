@@ -63,10 +63,13 @@ const Snooze = ({route, navigation}) => {
         ? 'hours'
         : 'minutes';
 
+    const snoozeTime2 =
+      selectedPickerValue === 'Custom' ? customHour * 60 : selectedPickerValue;
+
     let time = moment(new Date(alarmData.time.toDate())).add(snoozeTime);
     let endTime = moment(new Date(alarmData.endTime.toDate())).add(snoozeTime);
     let dateTime = moment(new Date(alarmData.dateTime)).add(snoozeTime);
-    console.log(time, endTime);
+    console.log(time, endTime, snoozeTime);
     firestore()
       .collection('Users')
       .doc(auth().currentUser.uid)
@@ -76,7 +79,10 @@ const Snooze = ({route, navigation}) => {
         dateTime: new Date(dateTime).toString(),
         time: new Date(time),
         endTime: new Date(endTime),
-        snoozeTime,
+        snoozeTime: new Date(
+          moment(new Date()).add(snoozeTime2, 'minutes'),
+        ).toISOString(),
+        isActive: true,
       })
       .finally(() => {
         setUpateLoading(false);

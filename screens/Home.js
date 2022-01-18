@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
+  Linking,
 } from 'react-native';
 import {Text} from '../components/Text';
 import colors from '../constant/colors.json';
@@ -32,7 +33,10 @@ import moment from 'moment';
 import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 import RNLocation from 'react-native-location';
 import {uniqBy} from 'lodash';
-import {finalCheck} from '../Utils/getLocationPermission';
+import {
+  finalCheck,
+  checkBackgroundPermission,
+} from '../Utils/getLocationPermission';
 
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
@@ -506,6 +510,9 @@ function Home({route, navigation}) {
           alarmRef.current[i].isActive = false;
         }
       } else if (item.isActive && item.distanceAlarm) {
+        if (item.snoozeTime && new Date() < new Date(item.snoozeTime)) {
+          return;
+        }
         const distance = getDistanceFromLatLon(
           coords.latitude,
           coords.longitude,
@@ -658,6 +665,24 @@ function Home({route, navigation}) {
       .catch(() => {
         Alert.alert(
           'You have not provided required location access, please enable it through settings.',
+        );
+      });
+
+    checkBackgroundPermission()
+      .then(() => {})
+      .catch(() => {
+        Alert.alert(
+          'Location Permission',
+          '2. You have not provided required location access, please enable it through settings.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                Linking.openSettings();
+                console.log('OK Pressed');
+              },
+            },
+          ],
         );
       });
 
@@ -866,14 +891,24 @@ function Home({route, navigation}) {
         onPress={onMapPress}
         onPoiClick={onPoiClick}
         showsUserLocation
-        showsMyLocationButton={true}
+        showsMyLocationButton={false}
         userLocationUpdateInterval={15000}
         showsPointsOfInterest={false}
         showsCompass={false}
         // onRegionChangeComplete={setRegion}
         loadingEnabled>
         {marker?.coordinate && (
-          <Marker pinColor={colors.skyblue} coordinate={marker.coordinate} />
+          <Marker
+            draggable
+            pinColor={colors.skyblue}
+            coordinate={marker.coordinate}
+            onPress={e => {
+              onMapPress(e);
+            }}
+            onDragEnd={e => {
+              onMapPress(e);
+            }}
+          />
         )}
         {alarmData?.map(item => {
           if (!item.distanceAlarm || !item.isActive) {
@@ -926,7 +961,7 @@ function Home({route, navigation}) {
       <TouchableOpacity
         style={{
           position: 'absolute',
-          bottom: 10,
+          bottom: 60,
           right: 10,
           backgroundColor: colors.white,
           padding: 15,
