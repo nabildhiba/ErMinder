@@ -145,6 +145,7 @@ const linking = {
     if (url != null) {
       return url;
     }
+    return null;
 
     // Check if there is an initial firebase notification
     const message = await notifee.getInitialNotification();

@@ -29,6 +29,10 @@ GoogleSignin.configure({
 });
 
 async function onGoogleButtonPress() {
+  const isUserSignedIn = await GoogleSignin.isSignedIn();
+  if (isUserSignedIn) {
+    await GoogleSignin.signOut();
+  }
   // Get the users ID token
   const {idToken} = await GoogleSignin.signIn();
 

@@ -634,18 +634,20 @@ function Home({route, navigation}) {
   };
 
   useEffect(() => {
-    checkAlarams();
+    if (alarmData.length > 0) {
+      checkAlarams();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alarmData]);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log('Foucs in');
-    });
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     console.log('Foucs in');
+  //   });
 
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
+  //   // Return the function to unsubscribe from the event so it gets removed on unmount
+  //   return unsubscribe;
+  // }, [navigation]);
 
   useEffect(() => {
     // RNLocation.requestPermission({
@@ -660,13 +662,7 @@ function Home({route, navigation}) {
     //     },
     //   },
     // });
-    finalCheck()
-      .then(() => {})
-      .catch(() => {
-        Alert.alert(
-          'You have not provided required location access, please enable it through settings.',
-        );
-      });
+    finalCheck().then(onCurrentPositionPress);
 
     checkBackgroundPermission()
       .then(() => {})
@@ -871,6 +867,38 @@ function Home({route, navigation}) {
     return unsubscribe;
   }, [navigation]);
 
+  // React.useEffect(() => {
+  //   if (canStart) {
+  //     // 👈 test if you can start otherwise nothing will happen
+  //     start();
+  //   }
+  // }, [canStart]);
+
+  const onCurrentPositionPress = () => {
+    // Geolocation.requestAuthorization();
+    Geolocation.getCurrentPosition(
+      info => {
+        if (info?.coords) {
+          const {coords} = info;
+          console.log(coords);
+          mapRef.current.animateToRegion({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          });
+        }
+      },
+      err => {
+        console.log(err?.message);
+        Alert.alert(
+          err?.message ? err?.message : 'Alert',
+          'Please make sure that location is turned on an app have permission.',
+        );
+      },
+    );
+  };
+
   return (
     <>
       <MapView
@@ -975,30 +1003,7 @@ function Home({route, navigation}) {
           shadowRadius: 6.27,
           elevation: 10,
         }}
-        onPress={() => {
-          // Geolocation.requestAuthorization();
-          Geolocation.getCurrentPosition(
-            info => {
-              if (info?.coords) {
-                const {coords} = info;
-                console.log(coords);
-                mapRef.current.animateToRegion({
-                  latitude: coords.latitude,
-                  longitude: coords.longitude,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
-                });
-              }
-            },
-            err => {
-              console.log(err?.message);
-              Alert.alert(
-                err?.message ? err?.message : 'Alert',
-                'Please make sure that location is turned on an app have permission.',
-              );
-            },
-          );
-        }}>
+        onPress={onCurrentPositionPress}>
         <MaterialIcons name="my-location" size={25} color={colors.gray} />
       </TouchableOpacity>
       {/* <View style={{position: 'absolute', top: 50}}>
