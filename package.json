@@ -58,6 +58,7 @@
     "react-native-tab-view": "^3.1.1",
     "react-native-vector-icons": "^8.1.0",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22",
+    "rn-tourguide": "^3.2.0",
     "toggle-switch-react-native": "^3.3.0"
   },
   "devDependencies": {
