@@ -290,7 +290,8 @@ const TimeAlarmCard = ({
   );
 };
 const NotesCard= ({
-  notes
+  notes,
+  setNotes
 }) => {
   return (
     <LinearGradient
@@ -312,7 +313,7 @@ const NotesCard= ({
             alignItems: 'center',
             // marginVertical: -10
           }}>
-          <TextInput style={styles.text} placeholder="Put a note here (running errands? Chopping a coffee?"></TextInput>
+          <TextInput onChangeText={setNotes} style={styles.text} placeholder="Put a note here (running errands? Chopping a coffee?"></TextInput>
           <TouchableOpacity>
           </TouchableOpacity>
         </View>
@@ -405,7 +406,7 @@ function Home({route, navigation}) {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
-  const [notes]=useState("");
+  const [notes,setNotes]=useState("");
   // const [notificationVia, setNotificationVia] = useState('App Notification');
   const [distanceCheckbox, setDistanceCheckbox] = useState(true);
   const [timeCheckbox, setTimeCheckbox] = useState(false);
@@ -1080,7 +1081,7 @@ function Home({route, navigation}) {
             timeCheckbox={timeCheckbox}
             setTimeCheckbox={setTimeCheckbox}
           />
-          <NotesCard notes={notes}>
+          <NotesCard notes={notes} setNotes={setNotes}>
 
           </NotesCard>
           {/* <NotificationViaCard
