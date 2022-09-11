@@ -37,6 +37,7 @@ import {
   finalCheck,
   checkBackgroundPermission,
 } from '../Utils/getLocationPermission';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
@@ -288,6 +289,38 @@ const TimeAlarmCard = ({
     </LinearGradient>
   );
 };
+const NotesCard= ({
+  notes,
+  setNotes
+}) => {
+  return (
+    <LinearGradient
+      colors={['#4292C5', '#1FAB86']}
+      style={{
+        // height: 80,
+        flexDirection: 'row',
+        backgroundColor: '#319EA7',
+        padding: 5,
+        borderRadius: 5,
+        marginBottom: 10,
+      }}>
+      <View style={{flex: 1}}>
+        <Text style={styles.text}>Notes</Text>
+        <View
+          style={{
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            alignItems: 'center',
+            // marginVertical: -10
+          }}>
+          <TextInput onChangeText={setNotes} style={styles.text} placeholder="Put a note here (running errands? Chopping a coffee?"></TextInput>
+          <TouchableOpacity>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </LinearGradient>
+  );
+};
 
 // const NotificationViaCard = ({notificationVia, setNotificationVia}) => {
 //   // const [notificationVia, setNotificationVia] = useState('App Notification');
@@ -373,6 +406,7 @@ function Home({route, navigation}) {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
+  const [notes,setNotes]=useState("");
   // const [notificationVia, setNotificationVia] = useState('App Notification');
   const [distanceCheckbox, setDistanceCheckbox] = useState(true);
   const [timeCheckbox, setTimeCheckbox] = useState(false);
@@ -589,6 +623,7 @@ function Home({route, navigation}) {
         date: date,
         time: time,
         endTime: endTime,
+        notes: notes,
         coordinate: marker.coordinate,
         location: resluts.data?.results[0]?.formatted_address ?? 'Unknown',
         distance: selectDistance,
@@ -1016,14 +1051,20 @@ function Home({route, navigation}) {
       <View>
         {/* <SearchBar /> */}
         <RBSheet
+         animationType="slide"
           ref={rawSheetRef}
-          height={300}
+          height={440}
           openDuration={250}
+          closeOnDragDown={true}
           customStyles={{
             container: {
               padding: 16,
             },
+            wrapper: {
+              backgroundColor: "transparent"
+            },
           }}>
+            <ScrollView>
           <DistanceAlarmCard
             distanceCheckbox={distanceCheckbox}
             setDistanceCheckbox={setDistanceCheckbox}
@@ -1040,11 +1081,15 @@ function Home({route, navigation}) {
             timeCheckbox={timeCheckbox}
             setTimeCheckbox={setTimeCheckbox}
           />
+          <NotesCard notes={notes} setNotes={setNotes}>
+
+          </NotesCard>
           {/* <NotificationViaCard
             notificationVia={notificationVia}
             setNotificationVia={setNotificationVia}
           /> */}
           <SubmitButton onPress={onSubmit} />
+          </ScrollView>
         </RBSheet>
       </View>
       <Spinner show={loading} />

@@ -108,6 +108,12 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
               {moment(data.item.dateTime).format('DD-MMM-YY, h:mm a')}
             </Text>
           )}
+          { (
+            <Text style={styles.text}>
+              Notes:{' '}
+              {data.item.notes}
+            </Text>
+          )}       
           {data.item?.snoozeTime && (
             <Text style={[styles.text]}>
               Snoozed until:{' '}
