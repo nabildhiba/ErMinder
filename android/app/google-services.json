@@ -14,13 +14,21 @@
       },
       "oauth_client": [
         {
+          "client_id": "108353413486-q2hb0qa6st28f3d17pi66d898m0jobf9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alarm",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "108353413486-ibnungoagc64o9k8eno2ctcfa3f6i8dn.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDerNS5S26-HxlHfbz9hnocWJi9mOdS77Q"
+          "current_key": "AIzaSyCKn3EQHXc59z1h5WCrwa-m-jZEP6f2jy8"
         }
       ],
       "services": {
