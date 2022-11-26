@@ -39,6 +39,8 @@ import {
 } from '../Utils/getLocationPermission';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
+const GLOBAL = require('../Utils/Global');
+
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
 ];
@@ -611,7 +613,7 @@ function Home({route, navigation}) {
     if (auth()?.currentUser?.uid) {
       setLoading(true);
       const resluts = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=AIzaSyCZgPZ3f4_DaC4Rh7qFAQSQu_9K4SSQLPk`,
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=${GLOBAL.API_KEY}`,
       );
       const Alarms = firestore()
         .collection('Users')
