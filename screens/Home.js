@@ -1003,7 +1003,7 @@ function Home({route, navigation}) {
         })}
       </MapView>
       <SearchBar
-        value={(data, details = null) => {
+        onPress={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
            console.log("We are here");
 
