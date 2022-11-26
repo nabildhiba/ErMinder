@@ -31,7 +31,7 @@
     "moment": "^2.29.1",
     "react": "17.0.2",
     "react-hook-form": "^7.17.2",
-    "react-native": "0.66.3",
+    "react-native": "0.66.5",
     "react-native-background-timer": "^2.4.1",
     "react-native-chart-kit": "^6.11.0",
     "react-native-encrypted-storage": "^4.0.2",
@@ -59,7 +59,8 @@
     "react-native-vector-icons": "^8.1.0",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22",
     "rn-tourguide": "^3.2.0",
-    "toggle-switch-react-native": "^3.3.0"
+    "toggle-switch-react-native": "^3.3.0",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

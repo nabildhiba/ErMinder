@@ -1003,9 +1003,9 @@ function Home({route, navigation}) {
         })}
       </MapView>
       <SearchBar
-        onPress={(data, details = null) => {
+        value={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
-          // console.log(details.geometry.location);
+           console.log("We are here");
 
           const {lat: latitude, lng: longitude} = details.geometry.location;
           // setRegion(prev => ({...prev, latitude, longitude}));
