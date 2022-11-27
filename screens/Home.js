@@ -417,13 +417,7 @@ function Home({route, navigation}) {
   const [alarmData, setAlarmData] = useState([]);
   const firstTime = useRef(true);
   const mapRef = useRef(null);
-  // console.log('currentLocation', currentLocation);
-  // const [region, setRegion] = useState({
-  //   latitude: 28,
-  //   longitude: 76,
-  //   latitudeDelta: 0.0922,
-  //   longitudeDelta: 0.0421,
-  // });
+  const [locationAlarmName,setLocationAlarm]=useState('');
 
   const onStop = () => {
     // Make always sure to remove the task before stoping the service. and instead of re-adding the task you can always update the task.
@@ -612,9 +606,14 @@ function Home({route, navigation}) {
     }
     if (auth()?.currentUser?.uid) {
       setLoading(true);
-      const resluts = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=${GLOBAL.API_KEY}`,
-      );
+      if(locationAlarmName==null){
+        //Todo: look
+        const resluts = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=${GLOBAL.MAPS_API_KEY}`,
+        );
+        console.log(resluts);
+       }
+      
       const Alarms = firestore()
         .collection('Users')
         .doc(auth().currentUser.uid)
@@ -627,7 +626,7 @@ function Home({route, navigation}) {
         endTime: endTime,
         notes: notes,
         coordinate: marker.coordinate,
-        location: resluts.data?.results[0]?.formatted_address ?? 'Unknown',
+        location: locationAlarmName??resluts.data?.results[0]?.formatted_address ?? 'Unknown',//place_id can be used to look for place
         distance: selectDistance,
         notificationVia: 'App Notification',
         dateTime: `${format(date, 'yyyy-MM-dd')}T${format(time, 'HH:mm:ss')}`,
@@ -1008,8 +1007,10 @@ function Home({route, navigation}) {
         onPress={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
            console.log("We are here");
+           console.log(details);
 
           const {lat: latitude, lng: longitude} = details.geometry.location;
+          setLocationAlarm(details.name);
           // setRegion(prev => ({...prev, latitude, longitude}));
           mapRef.current.animateToRegion({
             latitude: latitude,
