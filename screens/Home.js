@@ -602,7 +602,7 @@ function Home({ route, navigation }) {
       });
       return;
     }
-    function createAlarm(label) {
+    function createAlarm(label, place_id=null) {
       const Alarms = firestore()
         .collection('Users')
         .doc(auth().currentUser.uid)
@@ -617,6 +617,7 @@ function Home({ route, navigation }) {
         notes: notes,
         coordinate: marker.coordinate,
         location: label,
+        locationGooglePlaceId:place_id,
         distance: selectDistance,
         notificationVia: 'App Notification',
         dateTime: `${format(date, 'yyyy-MM-dd')}T${format(time, 'HH:mm:ss')}`,
@@ -648,15 +649,24 @@ function Home({ route, navigation }) {
 
     if (auth()?.currentUser?.uid) {
       setLoading(true);
-      console.log("Location alarm:"+locationAlarmName+"t");
       if (locationAlarmName.length == 0) {
-        //Todo: look
-        console.log("we are doing resluts!");
         resluts = await axios.get(
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=${GLOBAL.MAPS_API_KEY}`,
         ).then(
-          resp =>
-          createAlarm(resp.data?.results[0]?.formatted_address ?? 'Unknown address'));
+          async resp => {
+            // If no known place here => The alarm will be labeled unknown address
+            if (resp.data?.results[0].place_id.length == 0) {
+              createAlarm('Unknown address');
+              return;
+            }
+            //From here: we find a unique Google place=> Label the alarm by the place.
+            locationSearch = await axios.get(
+              `https://maps.googleapis.com/maps/api/place/details/json?place_id=${resp.data?.results[0].place_id}&key=${GLOBAL.MAPS_API_KEY}`
+            ).then(
+              lastRep => {
+                createAlarm(lastRep.data?.result?.name ?? 'Unknown address',resp.data?.results[0]?.place_id);
+              });
+          });
       } else {
         createAlarm(locationAlarmName);
       }
