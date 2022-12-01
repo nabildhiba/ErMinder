@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -8,20 +8,20 @@ import {
   Alert,
   Linking,
 } from 'react-native';
-import {Text} from '../components/Text';
+import { Text } from '../components/Text';
 import colors from '../constant/colors.json';
-import {showMessage} from 'react-native-flash-message';
+import { showMessage } from 'react-native-flash-message';
 import SearchBar from '../components/SearchBar';
 import AppCheckbox from '../components/AppCheckbox';
 import Spinner from '../components/Spinner';
-import MapView, {Marker, PROVIDER_GOOGLE, Circle} from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, Circle } from 'react-native-maps';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {format, formatDistanceToNow} from 'date-fns';
-import {getLocation} from '../Utils/requestLocationPermission';
+import { format, formatDistanceToNow } from 'date-fns';
+import { getLocation } from '../Utils/requestLocationPermission';
 import getDistanceFromLatLon from '../Utils/getDistanceFromLatLon';
 import notifee from '@notifee/react-native';
 import firestore from '@react-native-firebase/firestore';
@@ -32,12 +32,14 @@ import Geolocation from 'react-native-geolocation-service';
 import moment from 'moment';
 import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 import RNLocation from 'react-native-location';
-import {uniqBy} from 'lodash';
+import { uniqBy } from 'lodash';
 import {
   finalCheck,
   checkBackgroundPermission,
 } from '../Utils/getLocationPermission';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
+
+const GLOBAL = require('../Utils/Global');
 
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
@@ -99,17 +101,17 @@ const DistanceAlarmCard = ({
         borderRadius: 5,
         marginBottom: 10,
       }}>
-      <View style={{flex: 0.1}}>
+      <View style={{ flex: 0.1 }}>
         <AppCheckbox
           value={distanceCheckbox}
           onValueChange={newValue => {
             // console.log(newValue)
             // setDistanceCheckbox(newValue)
           }}
-          style={{margin: 5}}
+          style={{ margin: 5 }}
         />
       </View>
-      <View style={{flex: 0.9}}>
+      <View style={{ flex: 0.9 }}>
         <Text style={styles.text}>Distance Alarm</Text>
         <View
           style={{
@@ -119,7 +121,7 @@ const DistanceAlarmCard = ({
           <Text style={styles.text}>Distance:</Text>
           <TouchableOpacity
             onPress={() => pickerRef.current.focus()}
-            style={{flexDirection: 'row'}}>
+            style={{ flexDirection: 'row' }}>
             <Text style={styles.text}>{`${Math.round(
               selectDistance * 1609.344,
             )} meter(s)`}</Text>
@@ -127,10 +129,10 @@ const DistanceAlarmCard = ({
               name="chevron-down"
               size={20}
               color="#fff"
-              style={{position: 'relative', top: 5, right: 2}}
+              style={{ position: 'relative', top: 5, right: 2 }}
             />
             <Picker
-              style={{flex: 1, zIndex: 55555}}
+              style={{ flex: 1, zIndex: 55555 }}
               dropdownIconColor="#2BA29D"
               ref={pickerRef}
               selectedValue={selectDistance}
@@ -203,14 +205,14 @@ const TimeAlarmCard = ({
         borderRadius: 5,
         marginBottom: 10,
       }}>
-      <View style={{flex: 0.1}}>
+      <View style={{ flex: 0.1 }}>
         <AppCheckbox
           value={timeCheckbox}
           onValueChange={newValue => setTimeCheckbox(newValue)}
-          style={{margin: 5}}
+          style={{ margin: 5 }}
         />
       </View>
-      <View style={{flex: 0.9}}>
+      <View style={{ flex: 0.9 }}>
         <Text style={styles.text}>Time Alarm</Text>
         <View
           style={{
@@ -222,7 +224,7 @@ const TimeAlarmCard = ({
           <Text style={styles.text}>Date:</Text>
           <TouchableOpacity
             onPress={() => setShowDate(true)}
-            style={{flexDirection: 'row', alignItems: 'center'}}>
+            style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={styles.text}>{format(date, 'd-M-y')}</Text>
             <IIcon name="chevron-down" size={20} color="#fff" />
             {showDate && (
@@ -246,7 +248,7 @@ const TimeAlarmCard = ({
           <Text style={styles.text}>Start Time:</Text>
           <TouchableOpacity
             onPress={() => setShowTime(true)}
-            style={{flexDirection: 'row', alignItems: 'center'}}>
+            style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={styles.text}>{format(time, 'hh:mm a')}</Text>
             <IIcon name="chevron-down" size={20} color="#fff" />
             {showTime && (
@@ -269,7 +271,7 @@ const TimeAlarmCard = ({
           <Text style={styles.text}>End Time:</Text>
           <TouchableOpacity
             onPress={() => setShowEndTime(true)}
-            style={{flexDirection: 'row', alignItems: 'center'}}>
+            style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={styles.text}>{format(endTime, 'hh:mm a')}</Text>
             <IIcon name="chevron-down" size={20} color="#fff" />
             {showEndTime && (
@@ -289,7 +291,7 @@ const TimeAlarmCard = ({
     </LinearGradient>
   );
 };
-const NotesCard= ({
+const NotesCard = ({
   notes,
   setNotes
 }) => {
@@ -304,7 +306,7 @@ const NotesCard= ({
         borderRadius: 5,
         marginBottom: 10,
       }}>
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <Text style={styles.text}>Notes</Text>
         <View
           style={{
@@ -379,7 +381,7 @@ const NotesCard= ({
 //   );
 // };
 
-const SubmitButton = ({onPress = () => null}) => {
+const SubmitButton = ({ onPress = () => null }) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <LinearGradient
@@ -399,14 +401,14 @@ const SubmitButton = ({onPress = () => null}) => {
   );
 };
 
-function Home({route, navigation}) {
+function Home({ route, navigation }) {
   const [marker, setMarker] = useState(null);
   const rawSheetRef = useRef(null);
   const [selectDistance, setSelectDistance] = useState(milesArray[0]);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
-  const [notes,setNotes]=useState("");
+  const [notes, setNotes] = useState("");
   // const [notificationVia, setNotificationVia] = useState('App Notification');
   const [distanceCheckbox, setDistanceCheckbox] = useState(true);
   const [timeCheckbox, setTimeCheckbox] = useState(false);
@@ -415,13 +417,9 @@ function Home({route, navigation}) {
   const [alarmData, setAlarmData] = useState([]);
   const firstTime = useRef(true);
   const mapRef = useRef(null);
-  // console.log('currentLocation', currentLocation);
-  // const [region, setRegion] = useState({
-  //   latitude: 28,
-  //   longitude: 76,
-  //   latitudeDelta: 0.0922,
-  //   longitudeDelta: 0.0421,
-  // });
+  const [locationAlarmName, setLocationAlarm] = useState('');
+  const [placeIdAlarm, setLocationPlaceIdAlarm] = useState('');
+  
 
   const onStop = () => {
     // Make always sure to remove the task before stoping the service. and instead of re-adding the task you can always update the task.
@@ -479,7 +477,7 @@ function Home({route, navigation}) {
       id: data.id,
       title,
       body,
-      data: {...data, link: 'erminder://Snooze'},
+      data: { ...data, link: 'erminder://Snooze' },
       android: {
         channelId,
         sound: 'default',
@@ -536,10 +534,9 @@ function Home({route, navigation}) {
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
             )}`,
-            `2 You are ${Math.round(distance * 1609.344)} meters away from ${
-              item.location
+            `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location
             }`,
-            {id: item.id},
+            { id: item.id },
           );
           alarmRef.current[i].isActive = false;
         }
@@ -560,14 +557,13 @@ function Home({route, navigation}) {
               .doc(auth().currentUser.uid)
               .collection('Alarms')
               .doc(item.id)
-              .update({isActive: false});
+              .update({ isActive: false });
           }
           onDisplayNotification(
             item.location,
-            `You are ${Math.round(distance * 1609.344)} meters away from ${
-              item.location
+            `You are ${Math.round(distance * 1609.344)} meters away from ${item.location
             }`,
-            {id: item.id},
+            { id: item.id },
           );
           alarmRef.current[i].isActive = false;
         }
@@ -608,15 +604,13 @@ function Home({route, navigation}) {
       });
       return;
     }
-    if (auth()?.currentUser?.uid) {
-      setLoading(true);
-      const resluts = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=AIzaSyCZgPZ3f4_DaC4Rh7qFAQSQu_9K4SSQLPk`,
-      );
+    function createAlarm(label, place_id=null) {
       const Alarms = firestore()
         .collection('Users')
         .doc(auth().currentUser.uid)
         .collection('Alarms');
+      setLocationAlarm('');
+      setLocationPlaceIdAlarm('');
       Alarms.add({
         distanceAlarm: distanceCheckbox,
         timeAlarm: timeCheckbox,
@@ -625,13 +619,14 @@ function Home({route, navigation}) {
         endTime: endTime,
         notes: notes,
         coordinate: marker.coordinate,
-        location: resluts.data?.results[0]?.formatted_address ?? 'Unknown',
+        location: label,
+        locationGooglePlaceId:place_id,
         distance: selectDistance,
         notificationVia: 'App Notification',
         dateTime: `${format(date, 'yyyy-MM-dd')}T${format(time, 'HH:mm:ss')}`,
         dateTimeFormatted: `${format(date, 'dd/MM/yyyy')} ${format(
           time,
-          'HH:mm',
+          'HH:mm'
         )}`,
         isActive: true,
         createdAt: firestore.Timestamp.fromDate(new Date()),
@@ -654,13 +649,38 @@ function Home({route, navigation}) {
           });
         });
     }
+
+    if (auth()?.currentUser?.uid) {
+      setLoading(true);
+      if (locationAlarmName.length == 0) {
+        resluts = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=${GLOBAL.MAPS_API_KEY}`,
+        ).then(
+          async resp => {
+            // If no known place here => The alarm will be labeled unknown address
+            if (resp.data?.results[0].place_id.length == 0) {
+              createAlarm('Unknown address');
+              return;
+            }
+            //From here: we find a unique Google place=> Label the alarm by the place.
+            locationSearch = await axios.get(
+              `https://maps.googleapis.com/maps/api/place/details/json?place_id=${resp.data?.results[0].place_id}&key=${GLOBAL.MAPS_API_KEY}`
+            ).then(
+              lastRep => {
+                createAlarm(lastRep.data?.result?.name ?? 'Unknown address',resp.data?.results[0]?.place_id);
+              });
+          });
+      } else {
+        createAlarm(locationAlarmName,placeIdAlarm);
+      }
+    };
   };
 
   const checkAlarams = () => {
     const countActiveAlarams = alarmRef.current.reduce((acc, current) => {
       return acc + (current.isActive ? 1 : 0);
     }, 0);
-    console.log('countActiveAlarams', countActiveAlarams);
+
     if (countActiveAlarams === 0) {
       onStop();
     } else {
@@ -700,7 +720,7 @@ function Home({route, navigation}) {
     finalCheck().then(onCurrentPositionPress);
 
     checkBackgroundPermission()
-      .then(() => {})
+      .then(() => { })
       .catch(() => {
         Alert.alert(
           'Location Permission',
@@ -837,13 +857,13 @@ function Home({route, navigation}) {
               if (change.type === 'added') {
                 setAlarmData(prev => {
                   return uniqBy(
-                    [{...change.doc.data(), id: change.doc.id}, ...prev],
+                    [{ ...change.doc.data(), id: change.doc.id }, ...prev],
                     'id',
                   );
                 });
                 alarmRef.current = uniqBy(
                   [
-                    {...change.doc.data(), id: change.doc.id},
+                    { ...change.doc.data(), id: change.doc.id },
                     ...alarmRef.current,
                   ],
                   'id',
@@ -854,7 +874,7 @@ function Home({route, navigation}) {
                   return uniqBy(
                     prev.map(item => {
                       if (item.id === change.doc.id) {
-                        return {...item, ...change.doc.data()};
+                        return { ...item, ...change.doc.data() };
                       } else {
                         return item;
                       }
@@ -865,7 +885,7 @@ function Home({route, navigation}) {
                 alarmRef.current = uniqBy(
                   alarmRef.current.map(item => {
                     if (item.id === change.doc.id) {
-                      return {...item, ...change.doc.data()};
+                      return { ...item, ...change.doc.data() };
                     } else {
                       return item;
                     }
@@ -914,8 +934,8 @@ function Home({route, navigation}) {
     Geolocation.getCurrentPosition(
       info => {
         if (info?.coords) {
-          const {coords} = info;
-          console.log(coords);
+          const { coords } = info;
+
           mapRef.current.animateToRegion({
             latitude: coords.latitude,
             longitude: coords.longitude,
@@ -938,7 +958,7 @@ function Home({route, navigation}) {
     <>
       <MapView
         ref={mapRef}
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         provider={PROVIDER_GOOGLE}
         // region={region}
         // initialRegion={{
@@ -1005,9 +1025,10 @@ function Home({route, navigation}) {
       <SearchBar
         onPress={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
-           console.log("We are here");
-
-          const {lat: latitude, lng: longitude} = details.geometry.location;
+          console.log("We are here");
+          const { lat: latitude, lng: longitude } = details.geometry.location;
+          setLocationAlarm(details.name);
+          setLocationPlaceIdAlarm(data.place_id);
           // setRegion(prev => ({...prev, latitude, longitude}));
           mapRef.current.animateToRegion({
             latitude: latitude,
@@ -1016,7 +1037,7 @@ function Home({route, navigation}) {
             longitudeDelta: 0.0421,
           });
           setMarker({
-            coordinate: {latitude, longitude},
+            coordinate: { latitude, longitude },
           });
           rawSheetRef.current.open();
         }}
@@ -1051,7 +1072,7 @@ function Home({route, navigation}) {
       <View>
         {/* <SearchBar /> */}
         <RBSheet
-         animationType="slide"
+          animationType="slide"
           ref={rawSheetRef}
           height={440}
           openDuration={250}
@@ -1064,31 +1085,31 @@ function Home({route, navigation}) {
               backgroundColor: "transparent"
             },
           }}>
-            <ScrollView>
-          <DistanceAlarmCard
-            distanceCheckbox={distanceCheckbox}
-            setDistanceCheckbox={setDistanceCheckbox}
-            selectDistance={selectDistance}
-            setSelectDistance={setSelectDistance}
-          />
-          <TimeAlarmCard
-            date={date}
-            setDate={setDate}
-            time={time}
-            setTime={setTime}
-            endTime={endTime}
-            setEndTime={setEndTime}
-            timeCheckbox={timeCheckbox}
-            setTimeCheckbox={setTimeCheckbox}
-          />
-          <NotesCard notes={notes} setNotes={setNotes}>
+          <ScrollView>
+            <DistanceAlarmCard
+              distanceCheckbox={distanceCheckbox}
+              setDistanceCheckbox={setDistanceCheckbox}
+              selectDistance={selectDistance}
+              setSelectDistance={setSelectDistance}
+            />
+            <TimeAlarmCard
+              date={date}
+              setDate={setDate}
+              time={time}
+              setTime={setTime}
+              endTime={endTime}
+              setEndTime={setEndTime}
+              timeCheckbox={timeCheckbox}
+              setTimeCheckbox={setTimeCheckbox}
+            />
+            <NotesCard notes={notes} setNotes={setNotes}>
 
-          </NotesCard>
-          {/* <NotificationViaCard
+            </NotesCard>
+            {/* <NotificationViaCard
             notificationVia={notificationVia}
             setNotificationVia={setNotificationVia}
           /> */}
-          <SubmitButton onPress={onSubmit} />
+            <SubmitButton onPress={onSubmit} />
           </ScrollView>
         </RBSheet>
       </View>

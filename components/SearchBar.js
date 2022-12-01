@@ -3,12 +3,13 @@ import {TouchableOpacity, StyleSheet, View, Dimensions} from 'react-native';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
+const GLOBAL = require('../Utils/Global');
 const {width} = Dimensions.get('screen');
 
 export default function SearchBar({onPress}) {
   const [text, onChangeText] = React.useState('');
   const autoCompleteRef = useRef();
-  // console.log(text);
+
   return (
     <View style={styles.container}>
       <GooglePlacesAutocomplete
@@ -16,7 +17,7 @@ export default function SearchBar({onPress}) {
         placeholder="Search"
         onPress={onPress}
         query={{
-          key: 'AIzaSyCZgPZ3f4_DaC4Rh7qFAQSQu_9K4SSQLPk',
+          key: GLOBAL.MAPS_API_KEY,
           language: 'en',
         }}
         styles={{
