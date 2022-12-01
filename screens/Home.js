@@ -418,6 +418,8 @@ function Home({ route, navigation }) {
   const firstTime = useRef(true);
   const mapRef = useRef(null);
   const [locationAlarmName, setLocationAlarm] = useState('');
+  const [placeIdAlarm, setLocationPlaceIdAlarm] = useState('');
+  
 
   const onStop = () => {
     // Make always sure to remove the task before stoping the service. and instead of re-adding the task you can always update the task.
@@ -608,6 +610,7 @@ function Home({ route, navigation }) {
         .doc(auth().currentUser.uid)
         .collection('Alarms');
       setLocationAlarm('');
+      setLocationPlaceIdAlarm('');
       Alarms.add({
         distanceAlarm: distanceCheckbox,
         timeAlarm: timeCheckbox,
@@ -668,7 +671,7 @@ function Home({ route, navigation }) {
               });
           });
       } else {
-        createAlarm(locationAlarmName);
+        createAlarm(locationAlarmName,placeIdAlarm);
       }
     };
   };
@@ -1023,9 +1026,9 @@ function Home({ route, navigation }) {
         onPress={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
           console.log("We are here");
-
           const { lat: latitude, lng: longitude } = details.geometry.location;
           setLocationAlarm(details.name);
+          setLocationPlaceIdAlarm(data.place_id);
           // setRegion(prev => ({...prev, latitude, longitude}));
           mapRef.current.animateToRegion({
             latitude: latitude,
