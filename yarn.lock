@@ -6397,10 +6397,10 @@ rimraf@~2.2.6:
   resolved "https://registry.npmjs.org/rimraf/-/rimraf-2.2.8.tgz"
   integrity sha1-5Dm+Kq7jJzIZUnMPmaiSnk/FBYI=
 
-rn-tourguide@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.npmjs.org/rn-tourguide/-/rn-tourguide-3.2.0.tgz"
-  integrity sha512-oc7l8BFBXFmCol6hUG/wgll4TTClwk54iHtBqwdfgXnFJXZMX6174ekqB4/k6GyqbzO4cKNYldcGcMXQvX1nLQ==
+rn-tourguide@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/rn-tourguide/-/rn-tourguide-3.3.0.tgz#c85281559b1b00549cfe42eeace8eb9ebc714c7f"
+  integrity sha512-TvDvaIqZ4cpD22wiwzGXzpyZghFeZoIbW5R9uPDbJMLRctS8x//rxVhek154I/WmYlEDefVTEOfuAdYmDl81xg==
   dependencies:
     flubber "~0.4.2"
     hoist-non-react-statics "~3.0.1"

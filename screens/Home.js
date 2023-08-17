@@ -38,12 +38,17 @@ import {
   checkBackgroundPermission,
 } from '../Utils/getLocationPermission';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
-
+import {
+  TourGuideZone,
+  TourGuideZoneByPosition, // Component to use mask on overlay (ie, position absolute)
+  useTourGuideController, // hook to start, etc.
+} from 'rn-tourguide'
 const GLOBAL = require('../Utils/Global');
 
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
 ];
+
 
 // notifee.onBackgroundEvent(async ({type, detail}) => {
 //   // const {notification, pressAction} = detail;
@@ -324,6 +329,7 @@ const NotesCard = ({
   );
 };
 
+
 // const NotificationViaCard = ({notificationVia, setNotificationVia}) => {
 //   // const [notificationVia, setNotificationVia] = useState('App Notification');
 //   const pickerRef = useRef(null);
@@ -408,7 +414,7 @@ function Home({ route, navigation }) {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState('');
   // const [notificationVia, setNotificationVia] = useState('App Notification');
   const [distanceCheckbox, setDistanceCheckbox] = useState(true);
   const [timeCheckbox, setTimeCheckbox] = useState(false);
@@ -419,7 +425,7 @@ function Home({ route, navigation }) {
   const mapRef = useRef(null);
   const [locationAlarmName, setLocationAlarm] = useState('');
   const [placeIdAlarm, setLocationPlaceIdAlarm] = useState('');
-  
+
 
   const onStop = () => {
     // Make always sure to remove the task before stoping the service. and instead of re-adding the task you can always update the task.
@@ -430,6 +436,12 @@ function Home({ route, navigation }) {
     return ReactNativeForegroundService.stop();
   };
 
+  const { start, canStart } = useTourGuideController();
+  React.useEffect(() => {
+    if (canStart) {
+      start();
+    }
+  }, [canStart])
   const onStart = () => {
     // Checking if the task i am going to create already exist and running, which means that the foreground is also running.
     if (ReactNativeForegroundService.is_task_running(1234)) {
@@ -604,7 +616,7 @@ function Home({ route, navigation }) {
       });
       return;
     }
-    function createAlarm(label, place_id=null) {
+    function createAlarm(label, place_id = null) {
       const Alarms = firestore()
         .collection('Users')
         .doc(auth().currentUser.uid)
@@ -620,7 +632,7 @@ function Home({ route, navigation }) {
         notes: notes,
         coordinate: marker.coordinate,
         location: label,
-        locationGooglePlaceId:place_id,
+        locationGooglePlaceId: place_id,
         distance: selectDistance,
         notificationVia: 'App Notification',
         dateTime: `${format(date, 'yyyy-MM-dd')}T${format(time, 'HH:mm:ss')}`,
@@ -667,11 +679,11 @@ function Home({ route, navigation }) {
               `https://maps.googleapis.com/maps/api/place/details/json?place_id=${resp.data?.results[0].place_id}&key=${GLOBAL.MAPS_API_KEY}`
             ).then(
               lastRep => {
-                createAlarm(lastRep.data?.result?.name ?? 'Unknown address',resp.data?.results[0]?.place_id);
+                createAlarm(lastRep.data?.result?.name ?? 'Unknown address', resp.data?.results[0]?.place_id);
               });
           });
       } else {
-        createAlarm(locationAlarmName,placeIdAlarm);
+        createAlarm(locationAlarmName, placeIdAlarm);
       }
     };
   };
@@ -955,7 +967,7 @@ function Home({ route, navigation }) {
   };
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <MapView
         ref={mapRef}
         style={{ flex: 1 }}
@@ -1022,26 +1034,87 @@ function Home({ route, navigation }) {
           );
         })}
       </MapView>
-      <SearchBar
-        onPress={(data, details = null) => {
-          // 'details' is provided when fetchDetails = true
-          console.log("We are here");
-          const { lat: latitude, lng: longitude } = details.geometry.location;
-          setLocationAlarm(details.name);
-          setLocationPlaceIdAlarm(data.place_id);
-          // setRegion(prev => ({...prev, latitude, longitude}));
-          mapRef.current.animateToRegion({
-            latitude: latitude,
-            longitude: longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          });
-          setMarker({
-            coordinate: { latitude, longitude },
-          });
-          rawSheetRef.current.open();
-        }}
-      />
+
+       <TourGuideZoneByPosition
+          zone={1}
+          text={'This apps allows you to define an alarm on a map. When your are nearby the alarm raises! You can make a condition on date/time range !🎉'}
+          borderRadius={25}
+          isTourGuide
+          top={'9.9%'}
+          left={'13%'} //10% left, 10% right + 80 width
+          width={'75%'}
+          height={'6.2%'}
+        />
+
+<TourGuideZoneByPosition
+          zone={2}
+          text={'You can search for a place here 🎉'}
+          borderRadius={25}
+          isTourGuide
+          top={'9.9%'}
+          left={'13%'} //10% left, 10% right + 80 width
+          width={'75%'}
+          height={'6.2%'}
+        />
+
+        <TourGuideZoneByPosition
+          zone={3}
+          text={'Or point a location/place on the map to choose the location for your alarm. 🎉'}
+          borderRadius={16}
+          isTourGuide
+          bottom={50} 
+          height={'99%'}
+          width={'100%'}
+        />
+
+<TourGuideZoneByPosition
+          zone={4}
+          text={'You alarm will raise when you are close to location and within the date/time range if defined.'}
+          borderRadius={16}
+          isTourGuide
+          bottom={45} 
+          height={'99%'}
+          width={'100%'}
+        />
+
+<TourGuideZoneByPosition
+         zone={5}
+         text={'Click here to see and manage all your alarms.'}
+         shape={'circle'}
+         isTourGuide
+         top={'111%'}
+         right={'62%'}
+         height={45}
+        /> 
+
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0  }}>
+        {/* <TourGuideZone
+          zone={1}
+          borderRadius={16}
+          text={'Toto'}> */}
+            
+          <SearchBar 
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetails = true
+              console.log('We are here');
+              const { lat: latitude, lng: longitude } = details.geometry.location;
+              setLocationAlarm(details.name);
+              setLocationPlaceIdAlarm(data.place_id);
+              // setRegion(prev => ({...prev, latitude, longitude}));
+              mapRef.current.animateToRegion({
+                latitude: latitude,
+                longitude: longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              });
+              setMarker({
+                coordinate: { latitude, longitude },
+              });
+              rawSheetRef.current.open();
+            }}
+          />
+        {/* </TourGuideZone> */}
+      </View>
       <TouchableOpacity
         style={{
           position: 'absolute',
@@ -1062,6 +1135,7 @@ function Home({ route, navigation }) {
         onPress={onCurrentPositionPress}>
         <MaterialIcons name="my-location" size={25} color={colors.gray} />
       </TouchableOpacity>
+
       {/* <View style={{position: 'absolute', top: 50}}>
         <Text
           style={{
@@ -1114,7 +1188,7 @@ function Home({ route, navigation }) {
         </RBSheet>
       </View>
       <Spinner show={loading} />
-    </>
+    </View >
   );
 }
 
