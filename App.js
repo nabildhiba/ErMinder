@@ -31,6 +31,12 @@ import auth from '@react-native-firebase/auth';
 import SplashScreen from 'react-native-splash-screen';
 import Snooze from './screens/Snooze';
 import {finalCheck} from './Utils/getLocationPermission';
+import {
+  TourGuideProvider, // Main provider
+  TourGuideZone, // Main wrapper of highlight component
+  TourGuideZoneByPosition, // Component to use mask on overlay (ie, position absolute)
+  useTourGuideController, // hook to start, etc.
+} from 'rn-tourguide'
 
 const Stack = createNativeStackNavigator();
 
@@ -238,6 +244,7 @@ const App = () => {
     <View />
   ) : (
     <>
+     <TourGuideProvider {...{ borderRadius: 16 }}>
       <SafeAreaView style={styles.container}>
         <NavigationContainer linking={linking}>
           <Stack.Navigator
@@ -249,6 +256,7 @@ const App = () => {
         </NavigationContainer>
       </SafeAreaView>
       <FlashMessage position="top" />
+      </TourGuideProvider>
     </>
   );
 };
