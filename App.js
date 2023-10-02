@@ -36,7 +36,8 @@ import {
   TourGuideZone, // Main wrapper of highlight component
   TourGuideZoneByPosition, // Component to use mask on overlay (ie, position absolute)
   useTourGuideController, // hook to start, etc.
-} from 'rn-tourguide'
+} from 'rn-tourguide';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const Stack = createNativeStackNavigator();
 
@@ -197,6 +198,7 @@ const App = () => {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
   useEffect(() => {
+    crashlytics().crash();
     (async () => {
       let userData = auth().currentUser;
       if (userData === undefined || userData === null) {
@@ -244,18 +246,21 @@ const App = () => {
     <View />
   ) : (
     <>
-     <TourGuideProvider {...{ borderRadius: 16 }}>
-      <SafeAreaView style={styles.container}>
-        <NavigationContainer linking={linking}>
-          <Stack.Navigator
-            screenOptions={{header: () => null}}
-            initialRouteName={initialRoute}>
-            <Stack.Screen name="LoginNavigation" component={LoginNavigation} />
-            <Stack.Screen name="HomeNavigation" component={HomeNavigation} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaView>
-      <FlashMessage position="top" />
+      <TourGuideProvider {...{borderRadius: 16}}>
+        <SafeAreaView style={styles.container}>
+          <NavigationContainer linking={linking}>
+            <Stack.Navigator
+              screenOptions={{header: () => null}}
+              initialRouteName={initialRoute}>
+              <Stack.Screen
+                name="LoginNavigation"
+                component={LoginNavigation}
+              />
+              <Stack.Screen name="HomeNavigation" component={HomeNavigation} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+        <FlashMessage position="top" />
       </TourGuideProvider>
     </>
   );
