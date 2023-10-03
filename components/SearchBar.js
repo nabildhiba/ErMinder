@@ -1,14 +1,40 @@
-import React, {useRef} from 'react';
-import {TouchableOpacity, StyleSheet, View, Dimensions} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { TouchableOpacity, StyleSheet, View, Dimensions } from 'react-native';
 import IIcon from 'react-native-vector-icons/Ionicons';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import firestore from '@react-native-firebase/firestore';
+const { width } = Dimensions.get('screen');
 
-const GLOBAL = require('../Utils/Global');
-const {width} = Dimensions.get('screen');
-
-export default function SearchBar({onPress}) {
-  const [text, onChangeText] = React.useState('');
+export default function SearchBar({ onPress }) {
+  const [text, onChangeText] = useState('');
+  const [mapsValue, setMapsValue] = useState(null); // Initialize mapsValue as null
   const autoCompleteRef = useRef();
+
+  useEffect(() => {
+    // Fetch the value from Firestore and update mapsValue
+    const fetchMapsValue = async () => {
+      try {
+        const documentSnapshot = await firestore()
+          .collection('Metadatas')
+          .doc('MetaDataMaps')
+          .collection('Key')
+          .doc('MAPS_KEY')
+          .get();
+
+        if (documentSnapshot.exists) {
+          const data = documentSnapshot.data();
+          const value = data ? data.value : null;
+          setMapsValue(value); // Update mapsValue with the retrieved value
+        } else {
+          console.log('Document does not exist');
+        }
+      } catch (error) {
+        console.error('Error getting document:', error);
+      }
+    };
+
+    fetchMapsValue(); // Call the function to fetch and update mapsValue
+  }, []); // Run this effect only once on component mount
 
   return (
     <View style={styles.container}>
@@ -17,7 +43,7 @@ export default function SearchBar({onPress}) {
         placeholder="Search"
         onPress={onPress}
         query={{
-          key: GLOBAL.MAPS_API_KEY,
+          key: mapsValue || GLOBAL.MAPS_API_KEY, // Use mapsValue or a default key
           language: 'en',
         }}
         styles={{
@@ -27,10 +53,9 @@ export default function SearchBar({onPress}) {
             paddingRight: 36,
           },
         }}
-        textInputProps={{onChangeText}}
+        textInputProps={{ onChangeText }}
         enablePoweredByContainer={false}
         fetchDetails
-        // GoogleReverseGeocodingQuery
       />
       {text === '' ? (
         <TouchableOpacity
@@ -67,7 +92,6 @@ const styles = StyleSheet.create({
     height: 40,
     width: width * 0.8,
     margin: 12,
-    // borderWidth: 1,
     borderRadius: 15,
     padding: 10,
     backgroundColor: '#fff',
@@ -78,7 +102,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-
     elevation: 5,
   },
   iconContainer: {

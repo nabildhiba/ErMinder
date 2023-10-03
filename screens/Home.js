@@ -666,7 +666,7 @@ function Home({ route, navigation }) {
       setLoading(true);
       if (locationAlarmName.length == 0) {
         resluts = await axios.get(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=${GLOBAL.MAPS_API_KEY}`,
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}`,
         ).then(
           async resp => {
             // If no known place here => The alarm will be labeled unknown address
@@ -676,7 +676,7 @@ function Home({ route, navigation }) {
             }
             //From here: we find a unique Google place=> Label the alarm by the place.
             locationSearch = await axios.get(
-              `https://maps.googleapis.com/maps/api/place/details/json?place_id=${resp.data?.results[0].place_id}&key=${GLOBAL.MAPS_API_KEY}`
+              `https://maps.googleapis.com/maps/api/place/details/json?place_id=${resp.data?.results[0].place_id}`
             ).then(
               lastRep => {
                 createAlarm(lastRep.data?.result?.name ?? 'Unknown address', resp.data?.results[0]?.place_id);
