@@ -2,6 +2,7 @@ import React, {useRef} from 'react';
 import {TouchableOpacity, StyleSheet, View, Dimensions} from 'react-native';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import {logger} from '../Utils/logger';
 
 const GLOBAL = require('../Utils/Global');
 const {width} = Dimensions.get('screen');
@@ -35,6 +36,11 @@ export default function SearchBar({onPress}) {
       {text === '' ? (
         <TouchableOpacity
           onPress={() => {
+                logger({
+              title: 'ASYNC STORAGE',
+              message: `Error getting item ${key}`,
+              data : onPress
+            });
             autoCompleteRef?.current?.setAddressText('');
             onChangeText('');
           }}

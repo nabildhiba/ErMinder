@@ -198,7 +198,8 @@ const App = () => {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
   useEffect(() => {
-    // crashlytics().crash();
+     crashlytics().log("Test a tata");
+     //crashlytics().crash();
     (async () => {
       let userData = auth().currentUser;
       if (userData === undefined || userData === null) {
