@@ -17,14 +17,10 @@ export default function SearchBar({ onPress }) {
         const documentSnapshot = await firestore()
           .collection('Metadatas')
           .doc('MetaDataMaps')
-          .collection('Key')
-          .doc('MAPS_KEY')
           .get();
-
-        if (documentSnapshot.exists) {
-          const data = documentSnapshot.data();
-          const value = data ? data.value : null;
-          setMapsValue(value); // Update mapsValue with the retrieved value
+          const keyApi = documentSnapshot.data().MAPS_KEY;
+        if (keyApi != null) {
+          setMapsValue(keyApi); // Update mapsValue with the retrieved value
         } else {
           console.log('Document does not exist');
         }
@@ -43,7 +39,7 @@ export default function SearchBar({ onPress }) {
         placeholder="Search"
         onPress={onPress}
         query={{
-          key: mapsValue || GLOBAL.MAPS_API_KEY, // Use mapsValue or a default key
+          key: mapsValue, // Use mapsValue or a default key
           language: 'en',
         }}
         styles={{
