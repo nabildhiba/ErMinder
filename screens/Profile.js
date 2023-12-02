@@ -11,7 +11,7 @@ import {useEffect} from 'react';
 import CMultiSelect from '../components/CMultiSelect';
 import states from '../Utils/state.json';
 import {showMessage} from 'react-native-flash-message';
-
+import ErrorBoundary from '../Utils/ErrorBoundary';
 const titles = [
   {key: 'null', value: null, label: 'Select Title'},
   {value: 'CA', label: 'CA', key: 'CA'},
@@ -183,6 +183,7 @@ function Profile({route, navigation}) {
   }, []);
 
   return (
+    <ErrorBoundary>
     <ScrollView style={{flex: 1, width: '100%'}}>
       <View
         style={{
@@ -410,6 +411,7 @@ function Profile({route, navigation}) {
         </View>
       </View>
     </ScrollView>
+    </ErrorBoundary>
   );
 }
 

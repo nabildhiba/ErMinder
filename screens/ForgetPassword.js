@@ -11,7 +11,7 @@ import IIcon from 'react-native-vector-icons/Ionicons';
 import {showMessage} from 'react-native-flash-message';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import auth from '@react-native-firebase/auth';
-
+import ErrorBoundary from '../Utils/ErrorBoundary';
 const {height, width} = Dimensions.get('screen');
 
 function ForgetPassword({navigation}) {
@@ -50,7 +50,9 @@ function ForgetPassword({navigation}) {
   };
 
   return (
+    <ErrorBoundary>
     <ScrollView style={{backgroundColor: colors.primary}}>
+      
       <View
         style={{
           height: 60,
@@ -135,6 +137,7 @@ function ForgetPassword({navigation}) {
         </View>
       </View>
     </ScrollView>
+    </ErrorBoundary>
   );
 }
 

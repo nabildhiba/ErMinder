@@ -13,6 +13,7 @@ import MIcon from 'react-native-vector-icons/MaterialIcons';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {CommonActions} from '@react-navigation/routers';
 import auth from '@react-native-firebase/auth';
+import ErrorBoundary from '../Utils/ErrorBoundary';
 
 const ProfileButton = ({
   text,
@@ -82,6 +83,7 @@ function More({navigation}) {
       <ActivityIndicator size={30} color={colors.primary} />
     </View>
   ) : (
+    <ErrorBoundary>
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{marginTop: 20, paddingHorizontal: 10}}>
         <ProfileButton
@@ -91,6 +93,7 @@ function More({navigation}) {
         />
       </View>
     </View>
+    </ErrorBoundary>
   );
 }
 

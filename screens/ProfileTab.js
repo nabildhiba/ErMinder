@@ -12,7 +12,7 @@ import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import {launchImageLibrary} from 'react-native-image-picker';
 import firestore from '@react-native-firebase/firestore';
-
+import ErrorBoundary from '../Utils/ErrorBoundary';
 const PIC_SIZE = 150;
 
 const InfoRow = ({placeholder, value}) => {
@@ -71,6 +71,7 @@ function ProfileTab({navigation}) {
   };
 
   return (
+    <ErrorBoundary>
     <ScrollView style={styles.container}>
       <ImageBackground source={require('../assets/profileback.png')}>
         <View style={{height: 160}} />
@@ -123,6 +124,7 @@ function ProfileTab({navigation}) {
         </View>
       </ImageBackground>
     </ScrollView>
+    </ErrorBoundary>
   );
 }
 
