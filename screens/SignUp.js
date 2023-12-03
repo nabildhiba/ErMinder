@@ -2,9 +2,6 @@ import React, {useState} from 'react';
 import {
   Dimensions,
   StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Platform,
   ScrollView,
   View,
 } from 'react-native';

@@ -22,7 +22,7 @@ import {showMessage} from 'react-native-flash-message';
 import {CommonActions} from '@react-navigation/routers';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-
+import ErrorBoundary from '../Utils/ErrorBoundary';
 GoogleSignin.configure({
   webClientId:
     '108353413486-ibnungoagc64o9k8eno2ctcfa3f6i8dn.apps.googleusercontent.com',
@@ -185,6 +185,7 @@ function Login({navigation}) {
   };
 
   return (
+    <ErrorBoundary>
     <View
       style={{
         flex: 1,
@@ -358,6 +359,7 @@ function Login({navigation}) {
       {/* </View> */}
       {/* </View> */}
     </View>
+    </ErrorBoundary>
   );
 }
 

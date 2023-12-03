@@ -44,6 +44,7 @@ import {
   useTourGuideController, // hook to start, etc.
 } from 'rn-tourguide'
 const GLOBAL = require('../Utils/Global');
+import ErrorBoundary from '../Utils/ErrorBoundary';
 
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
@@ -967,7 +968,9 @@ function Home({ route, navigation }) {
   };
 
   return (
+    <ErrorBoundary>
     <View style={{ flex: 1 }}>
+       
       <MapView
         ref={mapRef}
         style={{ flex: 1 }}
@@ -1034,7 +1037,7 @@ function Home({ route, navigation }) {
           );
         })}
       </MapView>
-
+     
        <TourGuideZoneByPosition
           zone={1}
           text={'This apps allows you to define an alarm on a map. When your are nearby the alarm raises! You can make a condition on date/time range !🎉'}
@@ -1189,6 +1192,7 @@ function Home({ route, navigation }) {
       </View>
       <Spinner show={loading} />
     </View >
+    </ErrorBoundary>
   );
 }
 

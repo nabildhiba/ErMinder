@@ -11,7 +11,7 @@ import {format, differenceInMinutes, formatDistanceToNow} from 'date-fns';
 import moment from 'moment';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-
+import ErrorBoundary from '../Utils/ErrorBoundary';
 const {width} = Dimensions.get('screen');
 
 const pickerData = [
@@ -136,6 +136,7 @@ const Snooze = ({route, navigation}) => {
   }, [alarmData]);
 
   return (
+    <ErrorBoundary>
     <View style={styles.container}>
       <View style={{alignItems: 'center'}}>
         <MIcon name="bell-outline" size={128} color={colors.primary} />
@@ -258,6 +259,7 @@ const Snooze = ({route, navigation}) => {
         </View>
       </View>
     </View>
+    </ErrorBoundary>
   );
 };
 

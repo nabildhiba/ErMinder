@@ -19,6 +19,7 @@ import colors from '../constant/colors.json';
 import {Switch} from 'react-native-switch';
 import ToggleSwitch from 'toggle-switch-react-native';
 import moment from 'moment';
+import ErrorBoundary from '../Utils/ErrorBoundary';
 
 if (
   Platform.OS === 'android' &&
@@ -63,6 +64,7 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
   }
 
   return (
+    <ErrorBoundary>
     <View style={styles.cardContainer}>
       <TouchableOpacity
         onPress={() => {
@@ -158,6 +160,7 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
         </View>
       )}
     </View>
+    </ErrorBoundary>
   );
 };
 

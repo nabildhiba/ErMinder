@@ -25,17 +25,16 @@ import AlarmTab from './screens/AlarmTab';
 import ProfileTab from './screens/ProfileTab';
 import {MoreStackHeader} from './components/MoreStackHeader';
 import ForgetPassword from './screens/ForgetPassword';
+import {finalCheck} from './Utils/getLocationPermission';
+import Snooze from './screens/Snooze';
+import {ErrorBoundary} from './Utils/ErrorBoundary';
+
 import notifee, {EventType} from '@notifee/react-native';
 import auth from '@react-native-firebase/auth';
 // import IIcon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from 'react-native-splash-screen';
-import Snooze from './screens/Snooze';
-import {finalCheck} from './Utils/getLocationPermission';
 import {
   TourGuideProvider, // Main provider
-  TourGuideZone, // Main wrapper of highlight component
-  TourGuideZoneByPosition, // Component to use mask on overlay (ie, position absolute)
-  useTourGuideController, // hook to start, etc.
 } from 'rn-tourguide';
 import crashlytics from '@react-native-firebase/crashlytics';
 
@@ -123,6 +122,7 @@ const HomeNavigation = () => (
     <Tab.Screen name="SettingTab" component={ProfileTab} />
     <Tab.Screen name="LogOutTab" component={MoreStack} />
   </Tab.Navigator>
+  
 );
 
 const deepLinksConf = {
@@ -198,7 +198,7 @@ const App = () => {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
   useEffect(() => {
-     crashlytics().log("Test a tata");
+    crashlytics().log('App mounted.');
      //crashlytics().crash();
     (async () => {
       let userData = auth().currentUser;
@@ -249,7 +249,9 @@ const App = () => {
     <>
       <TourGuideProvider {...{borderRadius: 16}}>
         <SafeAreaView style={styles.container}>
+
           <NavigationContainer linking={linking}>
+          
             <Stack.Navigator
               screenOptions={{header: () => null}}
               initialRouteName={initialRoute}>
@@ -259,7 +261,9 @@ const App = () => {
               />
               <Stack.Screen name="HomeNavigation" component={HomeNavigation} />
             </Stack.Navigator>
+
           </NavigationContainer>
+
         </SafeAreaView>
         <FlashMessage position="top" />
       </TourGuideProvider>
