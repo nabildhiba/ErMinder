@@ -45,47 +45,12 @@ import {
 } from 'rn-tourguide'
 const GLOBAL = require('../Utils/Global');
 import ErrorBoundary from '../Utils/ErrorBoundary';
+import fetchMapsValue from '../Utils/FirestoreUtils';
 
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
 ];
 
-
-// notifee.onBackgroundEvent(async ({type, detail}) => {
-//   // const {notification, pressAction} = detail;
-//   // Check if the user pressed the "Mark as read" action
-//   // if (type === EventType.ACTION_PRESS && pressAction.id === 'mark-as-read') {
-//   //   // Update external API
-//   //   await fetch(`https://my-api.com/chat/${notification.data.chatId}/read`, {
-//   //     method: 'POST',
-//   //   });
-//   //   // Remove the notification
-//   //   await notifee.cancelNotification(notification.id);
-//   // }
-// });
-
-// const requestBackgroundLocationPermission = async () => {
-//   try {
-//     const granted = await PermissionsAndroid.request(
-//       PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-//       {
-//         title: 'Allow Location Access',
-//         message:
-//           'App needs to access your backgroud location to alert you when you are near a location, your location will not be stored online/offline',
-//         buttonNeutral: 'Ask Me Later',
-//         buttonNegative: 'Cancel',
-//         buttonPositive: 'OK',
-//       },
-//     );
-//     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-//       console.log('You can use the background location');
-//     } else {
-//       console.log('Background location permission denied');
-//     }
-//   } catch (err) {
-//     console.warn(err);
-//   }
-// };
 
 const DistanceAlarmCard = ({
   distanceCheckbox,
@@ -426,7 +391,7 @@ function Home({ route, navigation }) {
   const mapRef = useRef(null);
   const [locationAlarmName, setLocationAlarm] = useState('');
   const [placeIdAlarm, setLocationPlaceIdAlarm] = useState('');
-
+  const [mapsValue, setMapsValue] = useState(''); // Initialize mapsValue as null 
 
   const onStop = () => {
     // Make always sure to remove the task before stoping the service. and instead of re-adding the task you can always update the task.
@@ -453,13 +418,6 @@ function Home({ route, navigation }) {
       async () => {
         console.log(new Date());
         performTask();
-        // Geolocation.watchPosition(position => {
-        //   console.log(
-        //     'watch position',
-        //     position.coords.latitude,
-        //     position.coords.longitude,
-        //   );
-        // });
       },
       {
         delay: 20000,
@@ -665,19 +623,21 @@ function Home({ route, navigation }) {
 
     if (auth()?.currentUser?.uid) {
       setLoading(true);
+      
       if (locationAlarmName.length == 0) {
-        resluts = await axios.get(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}`,
+
+        getPlaceIdFromLatGeocodeRequest = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${marker.coordinate.latitude},${marker.coordinate.longitude}&key=${mapsValue}`,
         ).then(
           async resp => {
             // If no known place here => The alarm will be labeled unknown address
-            if (resp.data?.results[0].place_id.length == 0) {
+            if (resp.data?.results[0]?.place_id==null || resp.data?.results[0]?.place_id.length == 0) {
               createAlarm('Unknown address');
               return;
             }
             //From here: we find a unique Google place=> Label the alarm by the place.
             locationSearch = await axios.get(
-              `https://maps.googleapis.com/maps/api/place/details/json?place_id=${resp.data?.results[0].place_id}`
+              `https://maps.googleapis.com/maps/api/place/details/json?place_id=${resp.data?.results[0].place_id}&key=${mapsValue}`
             ).then(
               lastRep => {
                 createAlarm(lastRep.data?.result?.name ?? 'Unknown address', resp.data?.results[0]?.place_id);
@@ -701,9 +661,25 @@ function Home({ route, navigation }) {
     }
   };
 
+  //Retrieve Google api key from firestore
+  useEffect(() => {
+    const getKey = async () => {
+      try {
+        const keyApi = await fetchMapsValue();
+        if (keyApi) {
+          setMapsValue(keyApi); // Update mapsValue with the API key
+        }
+      } catch (error) {
+        console.error('Error fetching API key:', error);
+      }
+    };
+
+    getKey();
+  }, []);
+
   useEffect(() => {
     if (alarmData.length > 0) {
-      checkAlarams();
+      checkAlarams(); 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alarmData]);
@@ -1099,7 +1075,6 @@ function Home({ route, navigation }) {
           <SearchBar 
             onPress={(data, details = null) => {
               // 'details' is provided when fetchDetails = true
-              console.log('We are here');
               const { lat: latitude, lng: longitude } = details.geometry.location;
               setLocationAlarm(details.name);
               setLocationPlaceIdAlarm(data.place_id);
@@ -1115,6 +1090,7 @@ function Home({ route, navigation }) {
               });
               rawSheetRef.current.open();
             }}
+            keyMaps={mapsValue}
           />
         {/* </TourGuideZone> */}
       </View>

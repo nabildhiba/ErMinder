@@ -2,35 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TouchableOpacity, StyleSheet, View, Dimensions } from 'react-native';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import firestore from '@react-native-firebase/firestore';
 const { width } = Dimensions.get('screen');
 
-export default function SearchBar({ onPress }) {
+export default function SearchBar({ onPress,keyMaps }) {
   const [text, onChangeText] = useState('');
-  const [mapsValue, setMapsValue] = useState(null); // Initialize mapsValue as null
   const autoCompleteRef = useRef();
-
-  useEffect(() => {
-    // Fetch the value from Firestore and update mapsValue
-    const fetchMapsValue = async () => {
-      try {
-        const documentSnapshot = await firestore()
-          .collection('Metadatas')
-          .doc('MetaDataMaps')
-          .get();
-          const keyApi = documentSnapshot.data().MAPS_KEY;
-        if (keyApi != null) {
-          setMapsValue(keyApi); // Update mapsValue with the retrieved value
-        } else {
-          console.log('Document does not exist');
-        }
-      } catch (error) {
-        console.error('Error getting document:', error);
-      }
-    };
-
-    fetchMapsValue(); // Call the function to fetch and update mapsValue
-  }, []); // Run this effect only once on component mount
 
   return (
     <View style={styles.container}>
@@ -39,7 +15,7 @@ export default function SearchBar({ onPress }) {
         placeholder="Search"
         onPress={onPress}
         query={{
-          key: mapsValue, // Use mapsValue or a default key
+          key: keyMaps, // Use mapsValue or a default key
           language: 'en',
         }}
         styles={{
