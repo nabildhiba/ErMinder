@@ -7,6 +7,7 @@ import {
   Platform,
   Alert,
   Linking,
+  AsyncStorage
 } from 'react-native';
 import { Text } from '../components/Text';
 import colors from '../constant/colors.json';
@@ -405,7 +406,16 @@ function Home({ route, navigation }) {
   const { start, canStart } = useTourGuideController();
   React.useEffect(() => {
     if (canStart) {
-      start();
+      const checkFirstLaunch = async () => {
+        const hasOpenedBefore = await AsyncStorage.getItem('hasOpenedBefore');
+  
+        if (!hasOpenedBefore) {
+          // Your first-launch logic here
+          start();
+          await AsyncStorage.setItem('hasOpenedBefore', 'true');
+        }
+      };
+      checkFirstLaunch();
     }
   }, [canStart])
   const onStart = () => {
