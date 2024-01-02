@@ -1,4 +1,4 @@
-package com.alarm;
+package com.erminder;
 import android.os.Bundle;
 import org.devio.rn.splashscreen.SplashScreen; 
 import com.facebook.react.ReactActivity;
@@ -59,6 +59,6 @@ public class MainActivity extends ReactActivity {
   }
   @Override
   protected String getMainComponentName() {
-    return "Alarm";
+    return "Erminder";
   }
 }

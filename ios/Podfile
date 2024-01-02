@@ -3,7 +3,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '11.0'
 
-target 'Alarm' do
+target 'Erminder' do
   config = use_native_modules!
 
   use_react_native!(
@@ -18,7 +18,7 @@ target 'Alarm' do
 
   pod 'react-native-location', :path => '../node_modules/react-native-location'
 
-  target 'AlarmTests' do
+  target 'ErminderTests' do
     inherit! :complete
     # Pods for testing
   end
