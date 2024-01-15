@@ -7,6 +7,8 @@ import {
   Text,
   Linking,
   AppState,
+  Alert,
+  AsyncStorage
   // TouchableOpacity,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -27,7 +29,6 @@ import {MoreStackHeader} from './components/MoreStackHeader';
 import ForgetPassword from './screens/ForgetPassword';
 import {finalCheck} from './Utils/getLocationPermission';
 import Snooze from './screens/Snooze';
-import {ErrorBoundary} from './Utils/ErrorBoundary';
 
 import notifee, {EventType} from '@notifee/react-native';
 import auth from '@react-native-firebase/auth';
@@ -215,10 +216,21 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    const checkFirstLaunch = async () => {
+      const hasAlertBefore = await AsyncStorage.getItem('hasAlertBefore');
+      if (!hasAlertBefore) {
+        Alert.alert(
+          "Location Access Required",
+          "This app needs your location to provide alarm notifications based on your geographical position. Your location data stays private and is not shared."
+        );
+        await AsyncStorage.setItem('hasAlertBefore', 'true');
+      }
+    };
     if (isReady === true) {
       console.log('000000000000000000000');
       finalCheck();
     }
+    checkFirstLaunch();
   }, [isReady]);
 
   useEffect(() => {
