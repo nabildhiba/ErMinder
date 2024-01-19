@@ -29,12 +29,16 @@ GoogleSignin.configure({
 });
 
 async function onGoogleButtonPress() {
+  console("isUserSignedIn?");
   const isUserSignedIn = await GoogleSignin.isSignedIn();
   if (isUserSignedIn) {
+    console("isUserSignedIn?");
     await GoogleSignin.signOut();
   }
+  console("go to idToken");
   // Get the users ID token
   const {idToken} = await GoogleSignin.signIn();
+  console("go to idTokento googleCredential");
 
   // Create a Google credential with the token
   const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -316,6 +320,7 @@ function Login({navigation}) {
           }}>
           <TouchableOpacity
             onPress={() => {
+              console.log("clicked");
               onGoogleButtonPress()
                 .then(() => {
                   console.log('Success');

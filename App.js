@@ -7,8 +7,6 @@ import {
   Text,
   Linking,
   AppState,
-  Alert,
-  AsyncStorage
   // TouchableOpacity,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -216,21 +214,12 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const checkFirstLaunch = async () => {
-      const hasAlertBefore = await AsyncStorage.getItem('hasAlertBefore');
-      if (!hasAlertBefore) {
-        Alert.alert(
-          "Location Access Required",
-          "This app needs your location to provide alarm notifications based on your geographical position. Your location data stays private and is not shared."
-        );
-        await AsyncStorage.setItem('hasAlertBefore', 'true');
-      }
-    };
     if (isReady === true) {
       console.log('000000000000000000000');
-      finalCheck();
+     //finalCheck();
+     console.log("finito");
     }
-    checkFirstLaunch();
+
   }, [isReady]);
 
   useEffect(() => {
