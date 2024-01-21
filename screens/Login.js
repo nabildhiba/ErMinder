@@ -89,14 +89,6 @@ function Login({navigation}) {
     setIsLoading(true);
     auth()
       .signInWithEmailAndPassword(data.user_name, data.user_password)
-      // .then(() => {
-      //   navigation.dispatch(
-      //     CommonActions.reset({
-      //       index: 1,
-      //       routes: [{name: 'HomeNavigation'}],
-      //     }),
-      //   );
-      // })
       .catch(error => {
         const errorMessage = error.message;
         console.log(errorMessage);
@@ -302,18 +294,14 @@ function Login({navigation}) {
           alignItems: 'center',
           justifyContent: 'flex-end',
           width,
-          // backgroundColor: colors.white,
-          // height: 250,
           paddingBottom: 15,
           borderTopEndRadius: 25,
         }}>
         <View
-          style={{
-            flexDirection: 'row',
-            width: 140,
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
+            style={{
+              alignItems: 'center', // Align items in the center
+              justifyContent: 'center', // Center the content horizontally
+            }}>
           <TouchableOpacity
             onPress={() => {
               onGoogleButtonPress()
@@ -321,7 +309,7 @@ function Login({navigation}) {
                   console.log('Success');
                 })
                 .catch(err => {
-                  console.log(JSON.stringify(err));
+                  console.log(err);
                 });
             }}>
             <Image
@@ -330,8 +318,7 @@ function Login({navigation}) {
             />
           </TouchableOpacity>
           {/* <MCIcon name="google" size={40} color={'#000'} /> */}
-          <MCIcon name="facebook" size={40} color={'#3b5998'} />
-          <EIcon name="twitter-with-circle" size={40} color={'#1DA1F2'} />
+          
         </View>
         <TouchableOpacity
           onPress={() => {

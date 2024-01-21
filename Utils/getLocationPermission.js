@@ -1,4 +1,4 @@
-import {PermissionsAndroid, Platform} from 'react-native';
+import {PermissionsAndroid, Platform,  Alert,AsyncStorage} from 'react-native';
 
 export const checkLocationPermissions30Plus = async () => {
   const backgroundLocationPermissionGranted = await PermissionsAndroid.check(
@@ -103,28 +103,39 @@ export const checkBackgroundPermission = () => {
 
 export const finalCheck = () => {
   return new Promise((resolve, reject) => {
-    if (Platform.Version >= 30 && false) {
-      requestLocationPermission30Plus().then(res2 => {
-        if (!res2) {
-          reject();
-        }
-        resolve();
-      });
-      // checkLocationPermissions30Plus().then(res => {
-      //   if (!res) {
-      //   }
-      // });
-    } else {
-      requestLocationPermissionBelow30().then(res2 => {
-        if (!res2) {
-          reject();
-        }
-        resolve();
-      });
-      // checkLocationPermissionsBelow30().then(res => {
-      //   if (!res) {
-      //   }
-      // });
-    }
+    const checkFirstLaunch = async () => {
+      const hasAlertBefore = await AsyncStorage.getItem('hasAlertBefore');
+      if (!hasAlertBefore) {
+        Alert.alert(
+          "Location Access Required",
+          "Our app uses your location in the background, even when not in use, to trigger alarms based on your geographical position. This function is essential for the geo-alarm feature to operate effectively. We respect your privacy; your location data is not used for ads and is kept confidential.",
+          [
+            {
+            text:'I agree',
+            onPress: () =>
+            {
+              if (Platform.Version >= 30 && false) {
+                requestLocationPermission30Plus().then(res2 => {
+                  if (!res2) {
+                    reject();
+                  }
+                  resolve();
+                });
+              } else {
+                requestLocationPermissionBelow30().then(res2 => {
+                  if (!res2) {
+                    reject();
+                  }
+                  resolve();
+                });
+              }
+            }
+          }
+        ]
+        );
+        await AsyncStorage.setItem('hasAlertBefore', 'true');
+      }
+    };
+    checkFirstLaunch();
   });
 };

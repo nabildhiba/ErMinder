@@ -54,14 +54,24 @@ function More({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
   const [userLogedIn, setUserLoggedIn] = useState(true);
 
-  const logOut = async () => {
-    auth().signOut();
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 1,
-        routes: [{name: 'LoginNavigation'}],
-      }),
-    );
+const logOut = async () => {
+    console.log("will log out");
+    setIsLoading(true); // Start loading
+    try {
+      await auth().signOut();
+      console.log("logged out");
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: 'LoginNavigation'}],
+        }),
+      );
+    } catch (error) {
+      console.error("Logout failed: ", error);
+      // Handle logout error here
+    } finally {
+      setIsLoading(false); // End loading
+    }
   };
 
   useLayoutEffect(() => {

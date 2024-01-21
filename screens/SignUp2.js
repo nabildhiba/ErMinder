@@ -1,27 +1,27 @@
-import React, {useState} from 'react';
-import {Dimensions, StyleSheet, ScrollView, View} from 'react-native';
-import {useForm} from 'react-hook-form';
+import React, { useState } from 'react';
+import { Dimensions, StyleSheet, ScrollView, View } from 'react-native';
+import { useForm } from 'react-hook-form';
 
 import colors from '../constant/colors.json';
 import fontSize from '../constant/fontSize.json';
 import Button from '../components/Button';
-import {Text} from '../components/Text';
+import { Text } from '../components/Text';
 import CTextInput from '../components/CTextInput';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import FIcon from 'react-native-vector-icons/Fontisto';
-import {showMessage} from 'react-native-flash-message';
+import { showMessage } from 'react-native-flash-message';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import auth from '@react-native-firebase/auth';
-import {CommonActions} from '@react-navigation/routers';
+import { CommonActions } from '@react-navigation/routers';
 import firestore from '@react-native-firebase/firestore';
 
-const {height, width} = Dimensions.get('screen');
+const { height, width } = Dimensions.get('screen');
 
-function ForgetPassword({navigation}) {
+function ForgetPassword({ navigation }) {
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm();
 
   // TODO: use it wherever neeeded
@@ -30,23 +30,22 @@ function ForgetPassword({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async data => {
-    console.log(data);
     setIsLoading(true);
     auth()
       .createUserWithEmailAndPassword(data.user_email, data.user_password)
       .then(async res => {
+        // Construct the user data object, only adding properties that are not undefined
+        const userData = {
+          ...(data.fullname && { fullname: data.fullname }),
+          ...(data.user_email && { email: data.user_email }),
+          ...(data.user_phone && { phone: data.user_phone }),
+          ...(data.user_location && { location: data.user_location }),
+          ...(data.user_password && { password: data.user_password }),
+        };
+  
         const userDB = firestore().collection('Users').doc(res.user.uid);
-        await userDB.set(
-          {
-            fullname: data.fullname,
-            email: data.user_email,
-            phone: data.user_phone,
-            location: data.user_location,
-            password: data.user_password,
-          },
-          {merge: true},
-        );
-
+        await userDB.set(userData, { merge: true });
+  
         showMessage({
           message: 'Your account has been created.',
           type: 'success',
@@ -55,7 +54,7 @@ function ForgetPassword({navigation}) {
         navigation.dispatch(
           CommonActions.reset({
             index: 1,
-            routes: [{name: 'HomeNavigation'}],
+            routes: [{ name: 'HomeNavigation' }],
           }),
         );
       })
@@ -70,7 +69,7 @@ function ForgetPassword({navigation}) {
               type: 'danger',
             });
             break;
-
+  
           default:
             showMessage({
               message: errorMessage,
@@ -80,9 +79,10 @@ function ForgetPassword({navigation}) {
         }
       });
   };
+  
 
   return (
-    <ScrollView style={{backgroundColor: colors.primary}}>
+    <ScrollView style={{ backgroundColor: colors.primary }}>
       <View
         style={{
           height: 60,
@@ -114,7 +114,7 @@ function ForgetPassword({navigation}) {
           Sign Up
         </Text>
       </View>
-      <View style={{flex: 1, paddingHorizontal: 10}}>
+      <View style={{ flex: 1, paddingHorizontal: 10 }}>
         <View
           style={{
             minHeight: 250,
@@ -129,7 +129,7 @@ function ForgetPassword({navigation}) {
             rules={{
               required: true,
             }}
-            style={{width: '100%', minHeight: 55}}
+            style={{ width: '100%', minHeight: 55 }}
             placeholder={'Full Name'}
             icon={<IIcon name="person" size={20} color={colors.primary} />}
             name="fullname"
@@ -143,7 +143,7 @@ function ForgetPassword({navigation}) {
             rules={{
               required: true,
             }}
-            style={{width: '100%', minHeight: 55}}
+            style={{ width: '100%', minHeight: 55 }}
             placeholder={'Email'}
             icon={<IIcon name="mail" size={20} color={colors.primary} />}
             name="user_email"
@@ -155,30 +155,27 @@ function ForgetPassword({navigation}) {
           <CTextInput
             control={control}
             rules={{
-              required: true,
+              pattern: {
+                value: /^(\+?\d{1,3}|00\d{1,3})\d{6,11}$/,
+                message: "Invalid phone number format"
+              }
             }}
-            style={{width: '100%', minHeight: 55}}
+            style={{ width: '100%', minHeight: 55 }}
             placeholder={'Phone'}
-            icon={
-              <IIcon
-                name="ios-phone-portrait"
-                size={25}
-                color={colors.primary}
-              />
-            }
+            icon={<IIcon name="ios-phone-portrait" size={25} color={colors.primary} />}
             name="user_phone"
             keyboardType="phone-pad"
           />
           {errors.user_phone && (
-            <Text style={styles.error}>Please enter your phone number.</Text>
+            <Text style={styles.error}>
+              {errors.user_phone.message || "Please enter a valid phone number."}
+            </Text>
           )}
+
 
           <CTextInput
             control={control}
-            rules={{
-              required: true,
-            }}
-            style={{width: '100%', minHeight: 55}}
+            style={{ width: '100%', minHeight: 55 }}
             placeholder={'Location'}
             icon={<IIcon name="location" size={25} color={colors.primary} />}
             name="user_location"
@@ -192,8 +189,8 @@ function ForgetPassword({navigation}) {
             rules={{
               required: true,
             }}
-            style={{width: '100%', minHeight: 55}}
-            placeholder={'Password'}
+            style={{ width: '100%', minHeight: 55 }}
+            placeholder={'Password '}
             icon={<FIcon name="locked" size={20} color={colors.primary} />}
             name="user_password"
             password
@@ -202,7 +199,7 @@ function ForgetPassword({navigation}) {
             <Text style={styles.error}>Please enter your password.</Text>
           )}
 
-          <View style={{flex: 1, margin: 30}}>
+          <View style={{ flex: 1, margin: 30 }}>
             <Button
               text={'Submit'}
               style={{

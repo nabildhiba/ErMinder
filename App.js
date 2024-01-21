@@ -27,7 +27,6 @@ import {MoreStackHeader} from './components/MoreStackHeader';
 import ForgetPassword from './screens/ForgetPassword';
 import {finalCheck} from './Utils/getLocationPermission';
 import Snooze from './screens/Snooze';
-import {ErrorBoundary} from './Utils/ErrorBoundary';
 
 import notifee, {EventType} from '@notifee/react-native';
 import auth from '@react-native-firebase/auth';
@@ -217,8 +216,10 @@ const App = () => {
   useEffect(() => {
     if (isReady === true) {
       console.log('000000000000000000000');
-      finalCheck();
+     finalCheck();
+     console.log("finito");
     }
+
   }, [isReady]);
 
   useEffect(() => {
@@ -229,7 +230,6 @@ const App = () => {
       ) {
         console.log('App has come to the foreground!');
         Linking.getInitialURL().then(url => {
-          console.log(url);
         });
       }
 
