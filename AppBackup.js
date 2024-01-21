@@ -17,7 +17,6 @@ const requestLocationPermission = async () => {
         buttonPositive: 'OK',
       },
     );
-    console.log(granted);
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       return true;
     } else {

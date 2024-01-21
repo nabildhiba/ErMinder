@@ -7,7 +7,6 @@ const fetchMapsValue = async () => {
         .doc('MetaDataMaps')
         .get();
         const keyApi = documentSnapshot.data().MAPS_KEY;
-        console.log(keyApi);
       if (keyApi != null) {
         return keyApi; // Update mapsValue with the retrieved value
       } else {

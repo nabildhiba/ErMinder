@@ -216,7 +216,7 @@ const App = () => {
   useEffect(() => {
     if (isReady === true) {
       console.log('000000000000000000000');
-     //finalCheck();
+     finalCheck();
      console.log("finito");
     }
 
@@ -230,7 +230,6 @@ const App = () => {
       ) {
         console.log('App has come to the foreground!');
         Linking.getInitialURL().then(url => {
-          console.log(url);
         });
       }
 

@@ -38,7 +38,6 @@ function Login({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async data => {
-    console.log(data);
     // setIsLoading(true);
     // let res = await axiosApi({query: data, action: 'userRegister'}).catch(
     //   err => {

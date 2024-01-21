@@ -729,7 +729,6 @@ function Home({ route, navigation }) {
               text: 'OK',
               onPress: () => {
                 Linking.openSettings();
-                console.log('OK Pressed');
               },
             },
           ],
@@ -842,7 +841,6 @@ function Home({ route, navigation }) {
   useEffect(() => {
     // requestBackgroundLocationPermission();
     const unsubscribe = navigation.addListener('focus', e => {
-      console.log('refreshing');
       if (auth()?.currentUser?.uid) {
         // const allAlarms = [];
         firestore()
