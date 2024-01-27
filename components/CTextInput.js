@@ -1,10 +1,10 @@
 import React from 'react';
-import {Controller} from 'react-hook-form';
-import {View, TextInput, StyleSheet} from 'react-native';
+import { Controller } from 'react-hook-form';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import colors from '../constant/colors.json';
 import fontSize from '../constant/fontSize.json';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 
 export default function CTextInput({
   placeholder,
@@ -24,15 +24,16 @@ export default function CTextInput({
   ...rest
 }) {
   const [isEyeVisible, setIsEyeVisible] = React.useState(true);
+  
   return (
     <Controller
       control={control}
       rules={rules}
       render={({field: {onChange, onBlur, value}}) => (
-        <View
+        <TouchableOpacity
+          activeOpacity={0.9}
           style={{
             ...styles.container,
-            // backgroundColor: editable ? '#80808026' : '#808080',
             ...style,
           }}>
           {icon}
@@ -41,11 +42,7 @@ export default function CTextInput({
             numberOfLines={numberOfLines}
             placeholder={placeholder}
             placeholderTextColor={colors.textSecondary}
-            style={{
-              paddingLeft: 10,
-              color: colors.text,
-              fontSize: fontSize.normal,
-            }}
+            style={styles.textInput}
             onChangeText={e => {
               onChange(e);
               onChangeText(e);
@@ -54,30 +51,22 @@ export default function CTextInput({
             value={value}
             ref={inputRef}
             editable={editable}
-            // defaultValue={defaultValue}
             keyboardType={keyboardType ? keyboardType : 'default'}
-            secureTextEntry={password ? isEyeVisible : false}
+            secureTextEntry={password && isEyeVisible}
             {...rest}
           />
-          <View style={styles.passwordEye}>
-            {password &&
-              (isEyeVisible ? (
-                <IIcon
-                  name="eye-off-outline"
-                  size={20}
-                  color="gray"
-                  onPress={() => setIsEyeVisible(prev => !prev)}
-                />
-              ) : (
-                <IIcon
-                  name="eye-outline"
-                  size={20}
-                  color="gray"
-                  onPress={() => setIsEyeVisible(prev => !prev)}
-                />
-              ))}
-          </View>
-        </View>
+          {password && (
+            <TouchableOpacity
+              onPress={() => setIsEyeVisible(prev => !prev)}
+              style={styles.eyeIcon}>
+              <IIcon
+                name={isEyeVisible ? "eye-off-outline" : "eye-outline"}
+                size={20}
+                color="gray"
+              />
+            </TouchableOpacity>
+          )}
+        </TouchableOpacity>
       )}
       defaultValue={defaultValue}
       name={name}
@@ -85,69 +74,26 @@ export default function CTextInput({
   );
 }
 
-export const CPicker = ({
-  placeholder,
-  style = {},
-  icon,
-  password = false,
-  name,
-  defaultValue,
-  control,
-  keyboardType,
-  rules = {},
-  editable = true,
-  inputRef,
-  pickerData,
-  ...rest
-}) => {
-  return (
-    <Controller
-      control={control}
-      rules={rules}
-      render={({field: {onChange, onBlur, value}}) => (
-        <View
-          style={{
-            ...styles.container,
-            backgroundColor: editable ? '#80808026' : '#808080',
-            ...style,
-            paddingLeft: 8,
-          }}>
-          {icon}
-          <Picker
-            style={{
-              width: '100%',
-              color: colors.text,
-              fontSize: fontSize.normal,
-            }}
-            dropdownIconColor={colors.text}
-            selectedValue={value}
-            onValueChange={(itemValue, itemIndex) => onChange(itemValue)}>
-            {pickerData.map(item => (
-              <Picker.Item
-                key={item.key}
-                label={item.label}
-                value={item.value}
-              />
-            ))}
-          </Picker>
-        </View>
-      )}
-      defaultValue={defaultValue}
-      name={name}
-    />
-  );
-};
-
+// Styles adjustments
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: colors.secondary,
-    width: '90%',
+    width: '100%', // Adjusted for full width
     borderRadius: 30,
     alignItems: 'center',
     paddingHorizontal: 15,
-    minHeight: 55,
+    minHeight: 55, // Adjusted for adequate height
     marginTop: 20,
   },
-  passwordEye: {position: 'absolute', right: 20},
+  textInput: {
+    flex: 1, // Ensure it occupies the available space
+    paddingLeft: 10,
+    color: colors.text,
+    fontSize: fontSize.normal,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 20,
+  },
 });
