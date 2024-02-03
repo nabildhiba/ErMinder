@@ -6,6 +6,7 @@ import {
   View,
   Image,
   ImageBackground,
+  Alert
 } from 'react-native';
 import {useForm} from 'react-hook-form';
 
@@ -29,18 +30,27 @@ GoogleSignin.configure({
 });
 
 async function onGoogleButtonPress() {
-  const isUserSignedIn = await GoogleSignin.isSignedIn();
-  if (isUserSignedIn) {
-    await GoogleSignin.signOut();
+  try {
+    const isUserSignedIn = await GoogleSignin.isSignedIn();
+    if (isUserSignedIn) {
+      await GoogleSignin.signOut();
+    }
+    // Get the users ID token
+    const { idToken } = await GoogleSignin.signIn();
+
+    // Create a Google credential with the token
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+    // Sign-in the user with the credential
+    return auth().signInWithCredential(googleCredential);
+  } catch (error) {
+    // Display error message
+    // showMessage({
+    //   message: error.message, // Use the error message from the catch block
+    //   type: 'danger',
+    // });
+    console.error(error); // Optional: for debugging purposes
   }
-  // Get the users ID token
-  const {idToken} = await GoogleSignin.signIn();
-
-  // Create a Google credential with the token
-  const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-
-  // Sign-in the user with the credential
-  return auth().signInWithCredential(googleCredential);
 }
 
 const {height, width} = Dimensions.get('screen');
@@ -306,9 +316,21 @@ function Login({navigation}) {
             onPress={() => {
               onGoogleButtonPress()
                 .then(() => {
-                  console.log('Success');
+                  console.log('SuccessO');
                 })
                 .catch(err => {
+                  Alert.alert(
+                    'Error',
+                    err,
+                    [
+                      {
+                        text: 'OK',
+                        onPress: () => {
+                          Linking.openSettings();
+                        },
+                      },
+                    ],
+                  );
                   console.log(err);
                 });
             }}>

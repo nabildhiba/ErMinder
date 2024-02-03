@@ -9,16 +9,45 @@
       "client_info": {
         "mobilesdk_app_id": "1:108353413486:android:3f58a82cbeb783c520e17f",
         "android_client_info": {
+          "package_name": "com.alarm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "108353413486-ibnungoagc64o9k8eno2ctcfa3f6i8dn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKn3EQHXc59z1h5WCrwa-m-jZEP6f2jy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "108353413486-ibnungoagc64o9k8eno2ctcfa3f6i8dn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108353413486:android:87af21999d84786e20e17f",
+        "android_client_info": {
           "package_name": "com.erminder"
         }
       },
       "oauth_client": [
         {
-          "client_id": "108353413486-q2hb0qa6st28f3d17pi66d898m0jobf9.apps.googleusercontent.com",
+          "client_id": "108353413486-jsd9c464ng9d9ufc2je3eps0tepl1u6l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.erminder",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+            "certificate_hash": "f5c275f442bfa4698229cb3d5a4aff8d66546438"
           }
         },
         {
