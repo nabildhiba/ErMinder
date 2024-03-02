@@ -49,10 +49,16 @@ import ErrorBoundary from '../Utils/ErrorBoundary';
 import fetchMapsValue from '../Utils/FirestoreUtils';
 import crashlytics from '@react-native-firebase/crashlytics';
 
-const milesArray = [
-  0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
+const distanceArray = [
+  { distance: 50, unit: 'm' },
+  { distance: 100, unit: 'm' },
+  { distance: 200, unit: 'm' },
+  { distance: 300, unit: 'm' },
+  { distance: 400, unit: 'm' },
+  { distance: 1, unit: 'km' },
+  { distance: 2, unit: 'km' },
+  { distance: 5, unit: 'km' },
 ];
-
 
 const DistanceAlarmCard = ({
   distanceCheckbox,
@@ -96,7 +102,7 @@ const DistanceAlarmCard = ({
             onPress={() => pickerRef.current.focus()}
             style={{ flexDirection: 'row' }}>
             <Text style={styles.text}>{`${Math.round(
-              selectDistance * 1609.344,
+              selectDistance,
             )} meter(s)`}</Text>
             <IIcon
               name="chevron-down"
@@ -110,12 +116,13 @@ const DistanceAlarmCard = ({
               ref={pickerRef}
               selectedValue={selectDistance}
               onValueChange={itemValue => setSelectDistance(itemValue)}>
-              {milesArray.map(item => {
+              {distanceArray.map(item => {
+                const { label, value } = getLabelAndValue(item);
                 return (
                   <Picker.Item
-                    key={`${Math.round(item * 1609.344)} meter(s)`}
-                    label={`${Math.round(item * 1609.344)} meter(s)`}
-                    value={item}
+                    key={label}
+                    label={label}
+                    value={value}
                   />
                 );
               })}
@@ -125,6 +132,22 @@ const DistanceAlarmCard = ({
       </View>
     </LinearGradient>
   );
+};
+
+const getLabelAndValue = (item) => {
+  let label, value;
+
+  if (item.unit === 'km') {
+    // Convert kilometers to meters for the value
+    value = item.distance * 1000;
+    label = `${item.distance} Kilometer(s)`;
+  } else {
+    // Value is in meters, no conversion needed
+    value = item.distance;
+    label = `${item.distance} meter(s)`;
+  }
+
+  return { label, value };
 };
 
 const TimeAlarmCard = ({
@@ -298,62 +321,6 @@ const NotesCard = ({
 };
 
 
-// const NotificationViaCard = ({notificationVia, setNotificationVia}) => {
-//   // const [notificationVia, setNotificationVia] = useState('App Notification');
-//   const pickerRef = useRef(null);
-
-//   return (
-//     <LinearGradient
-//       colors={['#4292C5', '#1FAB86']}
-//       style={{
-//         flexDirection: 'row',
-//         backgroundColor: '#319EA7',
-//         padding: 5,
-//         borderRadius: 5,
-//         marginBottom: 10,
-//         alignItems: 'center',
-//         // justifyContent: 'space-between',
-//       }}>
-//       <View style={{flex: 0.9}}>
-//         <View
-//           style={{
-//             justifyContent: 'space-between',
-//             flexDirection: 'row',
-//             marginBottom: -20,
-//             paddingHorizontal: 10,
-//           }}>
-//           <Text style={styles.text}>Notification via: </Text>
-//           <TouchableOpacity
-//             onPress={() => pickerRef.current.focus()}
-//             style={{flexDirection: 'row'}}>
-//             <Text style={styles.text}>{notificationVia}</Text>
-//             <IIcon
-//               name="chevron-down"
-//               size={20}
-//               color="#fff"
-//               style={{position: 'relative', top: 5}}
-//             />
-//             <Picker
-//               dropdownIconColor="#2BA29D"
-//               ref={pickerRef}
-//               selectedValue={notificationVia}
-//               onValueChange={(itemValue, itemIndex) =>
-//                 setNotificationVia(itemValue)
-//               }>
-//               <Picker.Item label="Notification" value={'push_notification'} />
-//               <Picker.Item label="Email" value={'email'} enabled={false} />
-//               <Picker.Item
-//                 label="Ringtone"
-//                 value={'ringtone'}
-//                 enabled={false}
-//               />
-//             </Picker>
-//           </TouchableOpacity>
-//         </View>
-//       </View>
-//     </LinearGradient>
-//   );
-// };
 
 const SubmitButton = ({ onPress = () => null }) => {
   return (
@@ -378,7 +345,7 @@ const SubmitButton = ({ onPress = () => null }) => {
 function Home({ route, navigation }) {
   const [marker, setMarker] = useState(null);
   const rawSheetRef = useRef(null);
-  const [selectDistance, setSelectDistance] = useState(milesArray[0]);
+  const [selectDistance, setSelectDistance] = useState(distanceArray[0]);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
@@ -515,7 +482,7 @@ function Home({ route, navigation }) {
             `Time alarm (${item.location}) - ${formatDistanceToNow(
               new Date(item.dateTime),
             )}`,
-            `2 You are ${Math.round(distance * 1609.344)} meters away from ${item.location
+            `2 You are ${Math.round(distance)} meters away from ${item.location
             }`,
             { id: item.id },
           );
@@ -532,6 +499,7 @@ function Home({ route, navigation }) {
           item.coordinate.longitude,
         );
         if (distance <= item.distance) {
+          console.log('Distance: ' + distance + ' Item distance: ' + item.distance);
           if (auth()?.currentUser?.uid) {
             firestore()
               .collection('Users')
@@ -542,7 +510,7 @@ function Home({ route, navigation }) {
           }
           onDisplayNotification(
             item.location,
-            `You are ${Math.round(distance * 1609.344)} meters away from ${item.location
+            `You are ${Math.round(distance)} meters away from ${item.location
             }`,
             { id: item.id },
           );
@@ -1004,7 +972,7 @@ function Home({ route, navigation }) {
                     latitude: item.coordinate.latitude,
                     longitude: item.coordinate.longitude,
                   }}
-                  radius={item.distance * 1609.34}
+                  radius={item.distance}
                   fillColor="rgba(0, 0, 255, 0.05)"
                   strokeColor="rgba(100, 100, 100, 0.5)"
                   zIndex={2}
