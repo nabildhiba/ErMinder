@@ -47,6 +47,7 @@ import {
 const GLOBAL = require('../Utils/Global');
 import ErrorBoundary from '../Utils/ErrorBoundary';
 import fetchMapsValue from '../Utils/FirestoreUtils';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const milesArray = [
   0.0310685596, 0.0621371192, 0.1242742384, 0.1864113577, 0.2485484769,
@@ -408,7 +409,7 @@ function Home({ route, navigation }) {
     if (canStart) {
       const checkFirstLaunch = async () => {
         const hasOpenedBefore = await AsyncStorage.getItem('hasOpenedBefore');
-  
+
         if (!hasOpenedBefore) {
           // Your first-launch logic here
           start();
@@ -423,10 +424,9 @@ function Home({ route, navigation }) {
     if (ReactNativeForegroundService.is_task_running(1234)) {
       return;
     }
-
     ReactNativeForegroundService.add_task(
       async () => {
-        console.log(new Date());
+        console.log("Tache a ajouter.");
         performTask();
       },
       {
@@ -633,7 +633,7 @@ function Home({ route, navigation }) {
 
     if (auth()?.currentUser?.uid) {
       setLoading(true);
-      
+
       if (locationAlarmName.length == 0) {
 
         getPlaceIdFromLatGeocodeRequest = await axios.get(
@@ -641,7 +641,7 @@ function Home({ route, navigation }) {
         ).then(
           async resp => {
             // If no known place here => The alarm will be labeled unknown address
-            if (resp.data?.results[0]?.place_id==null || resp.data?.results[0]?.place_id.length == 0) {
+            if (resp.data?.results[0]?.place_id == null || resp.data?.results[0]?.place_id.length == 0) {
               createAlarm('Unknown address');
               return;
             }
@@ -689,7 +689,7 @@ function Home({ route, navigation }) {
 
   useEffect(() => {
     if (alarmData.length > 0) {
-      checkAlarams(); 
+      checkAlarams();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alarmData]);
@@ -953,76 +953,76 @@ function Home({ route, navigation }) {
 
   return (
     <ErrorBoundary>
-    <View style={{ flex: 1 }}>
-       
-      <MapView
-        ref={mapRef}
-        style={{ flex: 1 }}
-        provider={PROVIDER_GOOGLE}
-        // region={region}
-        // initialRegion={{
-        //   latitude: 37.78825,
-        //   longitude: -122.4324,
-        //   latitudeDelta: 0.0922,
-        //   longitudeDelta: 0.0421,
-        // }}
-        onUserLocationChange={e => {
-          // console.log(e.nativeEvent.coordinate);
-          // performOperation(e.nativeEvent.coordinate);
-        }}
-        onPress={onMapPress}
-        onPoiClick={onPoiClick}
-        showsUserLocation
-        showsMyLocationButton={false}
-        userLocationUpdateInterval={15000}
-        showsPointsOfInterest={false}
-        showsCompass={false}
-        // onRegionChangeComplete={setRegion}
-        loadingEnabled>
-        {marker?.coordinate && (
-          <Marker
-            draggable
-            pinColor={colors.skyblue}
-            coordinate={marker.coordinate}
-            onPress={e => {
-              onMapPress(e);
-            }}
-            onDragEnd={e => {
-              onMapPress(e);
-            }}
-          />
-        )}
-        {alarmData?.map(item => {
-          if (!item.distanceAlarm || !item.isActive) {
-            return null;
-          }
-          // return null;
-          return (
-            <React.Fragment key={item.id}>
-              <Circle
-                center={{
-                  latitude: item.coordinate.latitude,
-                  longitude: item.coordinate.longitude,
-                }}
-                radius={item.distance * 1609.34}
-                fillColor="rgba(0, 0, 255, 0.05)"
-                strokeColor="rgba(100, 100, 100, 0.5)"
-                zIndex={2}
-                strokeWidth={1}
-              />
-              <Marker
-                pinColor={colors.skyblue}
-                coordinate={{
-                  latitude: item.coordinate.latitude,
-                  longitude: item.coordinate.longitude,
-                }}
-              />
-            </React.Fragment>
-          );
-        })}
-      </MapView>
-     
-       <TourGuideZoneByPosition
+      <View style={{ flex: 1 }}>
+
+        <MapView
+          ref={mapRef}
+          style={{ flex: 1 }}
+          provider={PROVIDER_GOOGLE}
+          // region={region}
+          // initialRegion={{
+          //   latitude: 37.78825,
+          //   longitude: -122.4324,
+          //   latitudeDelta: 0.0922,
+          //   longitudeDelta: 0.0421,
+          // }}
+          onUserLocationChange={e => {
+            // console.log(e.nativeEvent.coordinate);
+            // performOperation(e.nativeEvent.coordinate);
+          }}
+          onPress={onMapPress}
+          onPoiClick={onPoiClick}
+          showsUserLocation
+          showsMyLocationButton={false}
+          userLocationUpdateInterval={15000}
+          showsPointsOfInterest={false}
+          showsCompass={false}
+          // onRegionChangeComplete={setRegion}
+          loadingEnabled>
+          {marker?.coordinate && (
+            <Marker
+              draggable
+              pinColor={colors.skyblue}
+              coordinate={marker.coordinate}
+              onPress={e => {
+                onMapPress(e);
+              }}
+              onDragEnd={e => {
+                onMapPress(e);
+              }}
+            />
+          )}
+          {alarmData?.map(item => {
+            if (!item.distanceAlarm || !item.isActive) {
+              return null;
+            }
+            // return null;
+            return (
+              <React.Fragment key={item.id}>
+                <Circle
+                  center={{
+                    latitude: item.coordinate.latitude,
+                    longitude: item.coordinate.longitude,
+                  }}
+                  radius={item.distance * 1609.34}
+                  fillColor="rgba(0, 0, 255, 0.05)"
+                  strokeColor="rgba(100, 100, 100, 0.5)"
+                  zIndex={2}
+                  strokeWidth={1}
+                />
+                <Marker
+                  pinColor={colors.skyblue}
+                  coordinate={{
+                    latitude: item.coordinate.latitude,
+                    longitude: item.coordinate.longitude,
+                  }}
+                />
+              </React.Fragment>
+            );
+          })}
+        </MapView>
+
+        <TourGuideZoneByPosition
           zone={1}
           text={'This apps allows you to define an alarm on a map. When your are nearby the alarm raises! You can make a condition on date/time range !🎉'}
           borderRadius={25}
@@ -1033,7 +1033,7 @@ function Home({ route, navigation }) {
           height={'6.2%'}
         />
 
-<TourGuideZoneByPosition
+        <TourGuideZoneByPosition
           zone={2}
           text={'You can search for a place here 🎉'}
           borderRadius={25}
@@ -1049,38 +1049,38 @@ function Home({ route, navigation }) {
           text={'Or point a location/place on the map to choose the location for your alarm. 🎉'}
           borderRadius={16}
           isTourGuide
-          bottom={50} 
+          bottom={50}
           height={'99%'}
           width={'100%'}
         />
 
-<TourGuideZoneByPosition
+        <TourGuideZoneByPosition
           zone={4}
           text={'You alarm will raise when you are close to location and within the date/time range if defined.'}
           borderRadius={16}
           isTourGuide
-          bottom={45} 
+          bottom={45}
           height={'99%'}
           width={'100%'}
         />
 
-<TourGuideZoneByPosition
-         zone={5}
-         text={'Click here to see and manage all your alarms.'}
-         shape={'circle'}
-         isTourGuide
-         top={'111%'}
-         right={'62%'}
-         height={45}
-        /> 
+        <TourGuideZoneByPosition
+          zone={5}
+          text={'Click here to see and manage all your alarms.'}
+          shape={'circle'}
+          isTourGuide
+          top={'111%'}
+          right={'62%'}
+          height={45}
+        />
 
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0  }}>
-        {/* <TourGuideZone
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+          {/* <TourGuideZone
           zone={1}
           borderRadius={16}
           text={'Toto'}> */}
-            
-          <SearchBar 
+
+          <SearchBar
             onPress={(data, details = null) => {
               // 'details' is provided when fetchDetails = true
               const { lat: latitude, lng: longitude } = details.geometry.location;
@@ -1100,82 +1100,82 @@ function Home({ route, navigation }) {
             }}
             keyMaps={mapsValue}
           />
-        {/* </TourGuideZone> */}
-      </View>
-      <TouchableOpacity
-        style={{
-          position: 'absolute',
-          bottom: 60,
-          right: 10,
-          backgroundColor: colors.white,
-          padding: 15,
-          borderRadius: 50,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 5,
-          },
-          shadowOpacity: 0.34,
-          shadowRadius: 6.27,
-          elevation: 10,
-        }}
-        onPress={onCurrentPositionPress}>
-        <MaterialIcons name="my-location" size={25} color={colors.gray} />
-      </TouchableOpacity>
+          {/* </TourGuideZone> */}
+        </View>
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            bottom: 60,
+            right: 10,
+            backgroundColor: colors.white,
+            padding: 15,
+            borderRadius: 50,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 5,
+            },
+            shadowOpacity: 0.34,
+            shadowRadius: 6.27,
+            elevation: 10,
+          }}
+          onPress={onCurrentPositionPress}>
+          <MaterialIcons name="my-location" size={25} color={colors.gray} />
+        </TouchableOpacity>
 
-      {/* <View style={{position: 'absolute', top: 50}}>
+        {/* <View style={{position: 'absolute', top: 50}}>
         <Text
           style={{
             fontSize: 20,
             color: 'red',
           }}>{`${currentLocation?.latitude}-${currentLocation?.longitude}`}</Text>
       </View> */}
-      <View>
-        {/* <SearchBar /> */}
-        <RBSheet
-          animationType="slide"
-          ref={rawSheetRef}
-          height={440}
-          openDuration={250}
-          closeOnDragDown={true}
-          customStyles={{
-            container: {
-              padding: 16,
-            },
-            wrapper: {
-              backgroundColor: "transparent"
-            },
-          }}>
-          <ScrollView>
-            <DistanceAlarmCard
-              distanceCheckbox={distanceCheckbox}
-              setDistanceCheckbox={setDistanceCheckbox}
-              selectDistance={selectDistance}
-              setSelectDistance={setSelectDistance}
-            />
-            <TimeAlarmCard
-              date={date}
-              setDate={setDate}
-              time={time}
-              setTime={setTime}
-              endTime={endTime}
-              setEndTime={setEndTime}
-              timeCheckbox={timeCheckbox}
-              setTimeCheckbox={setTimeCheckbox}
-            />
-            <NotesCard notes={notes} setNotes={setNotes}>
+        <View>
+          {/* <SearchBar /> */}
+          <RBSheet
+            animationType="slide"
+            ref={rawSheetRef}
+            height={440}
+            openDuration={250}
+            closeOnDragDown={true}
+            customStyles={{
+              container: {
+                padding: 16,
+              },
+              wrapper: {
+                backgroundColor: "transparent"
+              },
+            }}>
+            <ScrollView>
+              <DistanceAlarmCard
+                distanceCheckbox={distanceCheckbox}
+                setDistanceCheckbox={setDistanceCheckbox}
+                selectDistance={selectDistance}
+                setSelectDistance={setSelectDistance}
+              />
+              <TimeAlarmCard
+                date={date}
+                setDate={setDate}
+                time={time}
+                setTime={setTime}
+                endTime={endTime}
+                setEndTime={setEndTime}
+                timeCheckbox={timeCheckbox}
+                setTimeCheckbox={setTimeCheckbox}
+              />
+              <NotesCard notes={notes} setNotes={setNotes}>
 
-            </NotesCard>
-            {/* <NotificationViaCard
+              </NotesCard>
+              {/* <NotificationViaCard
             notificationVia={notificationVia}
             setNotificationVia={setNotificationVia}
           /> */}
-            <SubmitButton onPress={onSubmit} />
-          </ScrollView>
-        </RBSheet>
-      </View>
-      <Spinner show={loading} />
-    </View >
+              <SubmitButton onPress={onSubmit} />
+            </ScrollView>
+          </RBSheet>
+        </View>
+        <Spinner show={loading} />
+      </View >
     </ErrorBoundary>
   );
 }
