@@ -55,9 +55,7 @@ const distanceArray = [
   { distance: 200, unit: 'm' },
   { distance: 300, unit: 'm' },
   { distance: 400, unit: 'm' },
-  { distance: 1, unit: 'km' },
-  { distance: 2, unit: 'km' },
-  { distance: 5, unit: 'km' },
+  { distance: 1, unit: 'km' }
 ];
 
 const DistanceAlarmCard = ({
