@@ -101,7 +101,7 @@ const AlarmCard = ({data, cardOpenIndex, setCardOpenIndex}) => {
           {data.item.distanceAlarm && (
             <Text style={styles.text}>
               Distance Alarm:{' '}
-              {`${Math.round(data.item.distance * 1609.344)} meter`}
+              {`${Math.round(data.item.distance)} meter`}
             </Text>
           )}
           {data.item.timeAlarm && (
