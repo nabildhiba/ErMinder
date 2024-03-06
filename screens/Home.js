@@ -31,7 +31,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import Geolocation from 'react-native-geolocation-service';
 import moment from 'moment';
-import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 import RNLocation from 'react-native-location';
 import { uniqBy } from 'lodash';
 import {
@@ -40,14 +39,14 @@ import {
 } from '../Utils/getLocationPermission';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import {
-  TourGuideZone,
   TourGuideZoneByPosition, // Component to use mask on overlay (ie, position absolute)
   useTourGuideController, // hook to start, etc.
 } from 'rn-tourguide'
-const GLOBAL = require('../Utils/Global');
 import ErrorBoundary from '../Utils/ErrorBoundary';
 import fetchMapsValue from '../Utils/FirestoreUtils';
-import crashlytics from '@react-native-firebase/crashlytics';
+import {onStop,onStart} from '../Utils/TaskHelper';
+
+const TASK_ID = require('../Utils/Global');
 
 const distanceArray = [
   { distance: 50, unit: 'm' },
@@ -360,14 +359,7 @@ function Home({ route, navigation }) {
   const [placeIdAlarm, setLocationPlaceIdAlarm] = useState('');
   const [mapsValue, setMapsValue] = useState(''); // Initialize mapsValue as null 
 
-  const onStop = () => {
-    // Make always sure to remove the task before stoping the service. and instead of re-adding the task you can always update the task.
-    if (ReactNativeForegroundService.is_task_running(1234)) {
-      ReactNativeForegroundService.remove_task(1234);
-    }
-    // Stoping Foreground service.
-    return ReactNativeForegroundService.stop();
-  };
+
 
   const { start, canStart } = useTourGuideController();
   React.useEffect(() => {
@@ -384,31 +376,7 @@ function Home({ route, navigation }) {
       checkFirstLaunch();
     }
   }, [canStart])
-  const onStart = () => {
-    // Checking if the task i am going to create already exist and running, which means that the foreground is also running.
-    if (ReactNativeForegroundService.is_task_running(1234)) {
-      return;
-    }
-    ReactNativeForegroundService.add_task(
-      async () => {
-        console.log("Tache a ajouter.");
-        performTask();
-      },
-      {
-        delay: 20000,
-        onLoop: true,
-        taskId: 1234,
-        onError: e => console.log('Error logging:', e),
-      },
-    );
-    // starting  foreground service.
-    return ReactNativeForegroundService.start({
-      id: 1234,
-      title: 'Alert Service',
-      message:
-        'Your location is being used in background to notify you at a particular location.',
-    });
-  };
+
 
   async function onDisplayNotification(title, body, data = {}) {
     // Create a channel
@@ -442,7 +410,7 @@ function Home({ route, navigation }) {
     // debugCollection.add(object);
   };
 
-  const performOperation = coords => {
+  const raiseAnAlarmNotificationWhenConditionsAreMet = coords => {
     addDebugObject({
       type: 'current location',
       coords,
@@ -457,7 +425,6 @@ function Home({ route, navigation }) {
       firstTime.current = false;
     }
     alarmRef.current.forEach((item, i) => {
-      // console.log('--------------',item)
       if (item.isActive && item.timeAlarm && item.distanceAlarm) {
         const distance = getDistanceFromLatLon(
           coords.latitude,
@@ -465,10 +432,6 @@ function Home({ route, navigation }) {
           item.coordinate.latitude,
           item.coordinate.longitude,
         );
-        // const timeDifference = Math.abs(
-        //   differenceInMinutes(new Date(item.dateTime), new Date()),
-        // );
-        // console.log(4, timeDifference);
         if (
           item.time &&
           item.endTime &&
@@ -518,16 +481,7 @@ function Home({ route, navigation }) {
     });
   };
 
-  const performTask = async () => {
-    // RNLocation.getLatestLocation({timeout: 60000}).then(latestLocation => {
-    //   // performOperation(latestLocation);
-    //   console.log(111111111, latestLocation.latitude, latestLocation.longitude);
-    // });
-    getLocation().then(async res => {
-      console.log(2222222222, res.coords.latitude, res.coords.longitude);
-      performOperation(res.coords);
-    });
-  };
+
 
   const onMapPress = e => {
     setMarker({
@@ -633,7 +587,7 @@ function Home({ route, navigation }) {
     if (countActiveAlarams === 0) {
       onStop();
     } else {
-      onStart();
+      onStart(raiseAnAlarmNotificationWhenConditionsAreMet);
     }
   };
 
@@ -774,13 +728,6 @@ function Home({ route, navigation }) {
   // };
 
   useEffect(() => {
-    // BackgroundTimer.runBackgroundTimer(() => {
-    //   performTask();
-    // }, 30000);
-    // return () => {
-    //   BackgroundTimer.stopBackgroundTimer();
-    // // };
-    // onStart();
     RNLocation.configure({
       distanceFilter: 100, // Meters
       desiredAccuracy: {
