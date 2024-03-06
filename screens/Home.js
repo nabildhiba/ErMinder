@@ -46,7 +46,6 @@ import ErrorBoundary from '../Utils/ErrorBoundary';
 import fetchMapsValue from '../Utils/FirestoreUtils';
 import {onStop,onStart} from '../Utils/TaskHelper';
 
-const TASK_ID = require('../Utils/Global');
 
 const distanceArray = [
   { distance: 50, unit: 'm' },
@@ -63,8 +62,6 @@ const DistanceAlarmCard = ({
   selectDistance,
   setSelectDistance,
 }) => {
-  // const [toggleCheckBox, setToggleCheckBox] = useState(false);
-  // const [selectDistance, setSelectDistance] = useState(2);
   const pickerRef = useRef(null);
   return (
     <LinearGradient
@@ -115,6 +112,7 @@ const DistanceAlarmCard = ({
               onValueChange={itemValue => setSelectDistance(itemValue)}>
               {distanceArray.map(item => {
                 const { label, value } = getLabelAndValue(item);
+                console.log('label: '+label +' value: '+value);
                 return (
                   <Picker.Item
                     key={label}
@@ -342,7 +340,7 @@ const SubmitButton = ({ onPress = () => null }) => {
 function Home({ route, navigation }) {
   const [marker, setMarker] = useState(null);
   const rawSheetRef = useRef(null);
-  const [selectDistance, setSelectDistance] = useState(distanceArray[0]);
+  const [selectDistance, setSelectDistance] = useState(distanceArray[0].distance);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
