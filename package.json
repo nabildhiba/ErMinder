@@ -50,7 +50,7 @@
     "react-native-reanimated": "^2.2.4",
     "react-native-rename": "^3.2.13",
     "react-native-safe-area-context": "^3.3.2",
-    "react-native-screens": "^3.8.0",
+    "react-native-screens": "2.16.1",
     "react-native-select-two": "^1.1.0",
     "react-native-shadow": "^1.2.2",
     "react-native-splash-screen": "^3.3.0",
