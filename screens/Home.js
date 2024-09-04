@@ -343,7 +343,7 @@ const SubmitButton = ({ onPress = () => null }) => {
 function Home({ route, navigation }) {
   const [marker, setMarker] = useState(null);
   const rawSheetRef = useRef(null);
-  const [selectDistance, setSelectDistance] = useState(distanceArray[0]);
+  const [selectDistance, setSelectDistance] = useState(distanceArray[0].distance);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
