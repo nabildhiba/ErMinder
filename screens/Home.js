@@ -7,7 +7,8 @@ import {
   Platform,
   Alert,
   Linking,
-  AsyncStorage
+  AsyncStorage,
+  Dimensions
 } from 'react-native';
 import { Text } from '../components/Text';
 import colors from '../constant/colors.json';
@@ -67,6 +68,8 @@ const DistanceAlarmCard = ({
   // const [toggleCheckBox, setToggleCheckBox] = useState(false);
   // const [selectDistance, setSelectDistance] = useState(2);
   const pickerRef = useRef(null);
+
+
   return (
     <LinearGradient
       colors={['#4292C5', '#1FAB86']}
@@ -96,8 +99,10 @@ const DistanceAlarmCard = ({
             flexDirection: 'row',
           }}>
           <Text style={styles.text}>Distance:</Text>
-          <TouchableOpacity
-            onPress={() => pickerRef.current.focus()}
+          {/* <TouchableOpacity
+            onPress={() => {
+              pickerRef.current.focus()
+            }}
             style={{ flexDirection: 'row' }}>
             <Text style={styles.text}>{`${Math.round(
               selectDistance,
@@ -109,7 +114,7 @@ const DistanceAlarmCard = ({
               style={{ position: 'relative', top: 5, right: 2 }}
             />
             <Picker
-              style={{ flex: 1, zIndex: 55555 }}
+              style={{ zIndex: 55555 }}
               dropdownIconColor="#2BA29D"
               ref={pickerRef}
               selectedValue={selectDistance}
@@ -125,7 +130,43 @@ const DistanceAlarmCard = ({
                 );
               })}
             </Picker>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <View style={{
+            // borderWidth: 2,
+            height: 50,
+            top: -13,
+
+          }}>
+            <Picker
+              ref={pickerRef}
+              style={{
+                zIndex: 55555,
+                width: 200,
+                fontSize: 27,
+                color: '#fff',
+                position: 'relative',
+                left: -5,
+                marginRight: 0,
+                paddingRight: 0
+              }}
+              itemStyle={{
+                borderWidth: 2
+              }}
+              dropdownIconColor="#FFFFFF"
+              selectedValue={selectDistance}
+              onValueChange={itemValue => setSelectDistance(itemValue)}>
+              {distanceArray.map(item => {
+                const { label, value } = getLabelAndValue(item);
+                return (
+                  <Picker.Item
+                    key={label}
+                    label={label}
+                    value={value}
+                  />
+                );
+              })}
+            </Picker>
+          </View>
         </View>
       </View>
     </LinearGradient>
@@ -343,7 +384,7 @@ const SubmitButton = ({ onPress = () => null }) => {
 function Home({ route, navigation }) {
   const [marker, setMarker] = useState(null);
   const rawSheetRef = useRef(null);
-  const [selectDistance, setSelectDistance] = useState(distanceArray[0].distance);
+  const [selectDistance, setSelectDistance] = useState(distanceArray[0]);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
