@@ -141,6 +141,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 20
         versionName "1.7"
+
     }
     splits {
         abi {
