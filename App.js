@@ -1,3 +1,5 @@
+import {enableScreens} from 'react-native-screens'
+enableScreens()
 // import SplashScreen from 'react-native-splash-screen';
 import React, {useState, useEffect, useRef} from 'react';
 import {
