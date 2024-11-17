@@ -23,7 +23,8 @@ import IIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format, formatDistanceToNow } from 'date-fns';
-import { getLocation } from '../Utils/requestLocationPermission';
+import { requestPostNotificationPermission } from '../Utils/getNotificationPermission';
+
 import getDistanceFromLatLon from '../Utils/getDistanceFromLatLon';
 import notifee from '@notifee/react-native';
 import firestore from '@react-native-firebase/firestore';
@@ -37,8 +38,10 @@ import RNLocation from 'react-native-location';
 import { uniqBy } from 'lodash';
 import {
   finalCheck,
-  checkBackgroundPermission,
+  checkBackgroundPermission
 } from '../Utils/getLocationPermission';
+import { getLocation } from '../Utils/requestLocationPermission';
+
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import {
   TourGuideZone,
@@ -99,38 +102,6 @@ const DistanceAlarmCard = ({
             flexDirection: 'row',
           }}>
           <Text style={styles.text}>Distance:</Text>
-          {/* <TouchableOpacity
-            onPress={() => {
-              pickerRef.current.focus()
-            }}
-            style={{ flexDirection: 'row' }}>
-            <Text style={styles.text}>{`${Math.round(
-              selectDistance,
-            )} meter(s)`}</Text>
-            <IIcon
-              name="chevron-down"
-              size={20}
-              color="#fff"
-              style={{ position: 'relative', top: 5, right: 2 }}
-            />
-            <Picker
-              style={{ zIndex: 55555 }}
-              dropdownIconColor="#2BA29D"
-              ref={pickerRef}
-              selectedValue={selectDistance}
-              onValueChange={itemValue => setSelectDistance(itemValue)}>
-              {distanceArray.map(item => {
-                const { label, value } = getLabelAndValue(item);
-                return (
-                  <Picker.Item
-                    key={label}
-                    label={label}
-                    value={value}
-                  />
-                );
-              })}
-            </Picker>
-          </TouchableOpacity> */}
           <View style={{
             // borderWidth: 2,
             height: 50,
@@ -384,7 +355,7 @@ const SubmitButton = ({ onPress = () => null }) => {
 function Home({ route, navigation }) {
   const [marker, setMarker] = useState(null);
   const rawSheetRef = useRef(null);
-  const [selectDistance, setSelectDistance] = useState(distanceArray[0]);
+  const [selectDistance, setSelectDistance] = useState(distanceArray[0].distance);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
@@ -431,7 +402,7 @@ function Home({ route, navigation }) {
       return;
     }
     ReactNativeForegroundService.add_task(
-      async () => {
+       () => {
         console.log("Tache a ajouter.");
         performTask();
       },
@@ -442,6 +413,7 @@ function Home({ route, navigation }) {
         onError: e => console.log('Error logging:', e),
       },
     );
+    console.log("Starting foreground service now...");
     // starting  foreground service.
     return ReactNativeForegroundService.start({
       id: 1234,
@@ -510,6 +482,7 @@ function Home({ route, navigation }) {
         //   differenceInMinutes(new Date(item.dateTime), new Date()),
         // );
         // console.log(4, timeDifference);
+        console.log("Distance is: " +distance + " and item.distance " + item.distance);
         if (
           item.time &&
           item.endTime &&
@@ -560,10 +533,6 @@ function Home({ route, navigation }) {
   };
 
   const performTask = async () => {
-    // RNLocation.getLatestLocation({timeout: 60000}).then(latestLocation => {
-    //   // performOperation(latestLocation);
-    //   console.log(111111111, latestLocation.latitude, latestLocation.longitude);
-    // });
     getLocation().then(async res => {
       console.log(2222222222, res.coords.latitude, res.coords.longitude);
       performOperation(res.coords);
@@ -623,7 +592,7 @@ function Home({ route, navigation }) {
           setLoading(false);
           setTimeCheckbox(false);
           setMarker({});
-          // setDistanceCheckbox(false);
+          
           rawSheetRef.current.close();
           showMessage({
             message: 'Alarm have been added successfully.',
@@ -672,6 +641,7 @@ function Home({ route, navigation }) {
     }, 0);
 
     if (countActiveAlarams === 0) {
+      console.log('will stop');
       onStop();
     } else {
       onStart();
@@ -695,34 +665,15 @@ function Home({ route, navigation }) {
   }, []);
 
   useEffect(() => {
-    if (alarmData.length > 0) {
+    if (true ||alarmData.length > 0) {
       checkAlarams();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alarmData]);
 
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     console.log('Foucs in');
-  //   });
-
-  //   // Return the function to unsubscribe from the event so it gets removed on unmount
-  //   return unsubscribe;
-  // }, [navigation]);
 
   useEffect(() => {
-    // RNLocation.requestPermission({
-    //   ios: 'always', // or 'always'
-    //   android: {
-    //     detail: 'fine', // or 'fine'
-    //     rationale: {
-    //       title: 'We need to access your location',
-    //       message: 'We use your location to show where you are on the map',
-    //       buttonPositive: 'OK',
-    //       buttonNegative: 'Cancel',
-    //     },
-    //   },
-    // });
+  
     finalCheck().then(onCurrentPositionPress);
 
     checkBackgroundPermission()
@@ -742,86 +693,18 @@ function Home({ route, navigation }) {
         );
       });
 
-    // const timeout = setTimeout(() => {
-    //   PermissionsAndroid.check(
-    //     PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-    //   ).then(response => {
-    //     console.log(response);
-    //   });
-    // }, 10000);
-    // return () => {
-    //   clearTimeout(timeout);
-    // };
   }, []);
 
-  // const newMethod = async () => {
-  //   const backgroundgranted = await PermissionsAndroid.request(
-  //     PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-  //     {
-  //       title: 'Background Location Permission',
-  //       message:
-  //         'We need access to your location ' +
-  //         'so you can get live quality updates.',
-  //       buttonNeutral: 'Ask Me Later',
-  //       buttonNegative: 'Cancel',
-  //       buttonPositive: 'OK',
-  //     },
-  //   );
-  //   if (backgroundgranted === PermissionsAndroid.RESULTS.GRANTED) {
-  //     let locationSubscription = null;
-  //     let locationTimeout = null;
-  //     ReactNativeForegroundService.add_task(
-  //       () => {
-  //         // RNLocation.getLatestLocation().then(res => {
-  //         //   console.log(res);
-  //         // });
-  //         RNLocation.requestPermission({
-  //           ios: 'always',
-  //           android: {
-  //             detail: 'fine',
-  //           },
-  //         }).then(granted => {
-  //           console.log('Location Permissions: ', granted);
-  //           // if has permissions try to obtain location with RN location
-  //           if (granted) {
-  //             locationSubscription && locationSubscription();
-  //             locationSubscription = RNLocation.subscribeToLocationUpdates(
-  //               ([locations]) => {
-  //                 locationSubscription();
-  //                 locationTimeout && clearTimeout(locationTimeout);
-  //                 console.log(1223, locations.latitude);
-  //               },
-  //             );
-  //           } else {
-  //             locationSubscription && locationSubscription();
-  //             locationTimeout && clearTimeout(locationTimeout);
-  //             console.log('no permissions to obtain location');
-  //           }
-  //         });
-  //       },
-  //       {
-  //         delay: 12000,
-  //         onLoop: true,
-  //         taskId: 'taskid',
-  //         onError: e => console.log('Error logging:', e),
-  //       },
-  //     );
-  //     ReactNativeForegroundService.start({
-  //       id: 'taskid',
-  //       title: 'Alert Service',
-  //       message: 'Your location is being used in background.',
-  //     });
-  //   }
-  // };
 
   useEffect(() => {
-    // BackgroundTimer.runBackgroundTimer(() => {
-    //   performTask();
-    // }, 30000);
-    // return () => {
-    //   BackgroundTimer.stopBackgroundTimer();
-    // // };
-    // onStart();
+    //finalCheckNotification();
+    requestPostNotificationPermission();
+
+  }, []);
+
+
+  useEffect(() => {
+
     RNLocation.configure({
       distanceFilter: 100, // Meters
       desiredAccuracy: {
@@ -926,12 +809,6 @@ function Home({ route, navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  // React.useEffect(() => {
-  //   if (canStart) {
-  //     // 👈 test if you can start otherwise nothing will happen
-  //     start();
-  //   }
-  // }, [canStart]);
 
   const onCurrentPositionPress = () => {
     // Geolocation.requestAuthorization();
@@ -1003,6 +880,7 @@ function Home({ route, navigation }) {
             if (!item.distanceAlarm || !item.isActive) {
               return null;
             }
+            var radiuss= item.distance;
             // return null;
             return (
               <React.Fragment key={item.id}>
@@ -1011,7 +889,7 @@ function Home({ route, navigation }) {
                     latitude: item.coordinate.latitude,
                     longitude: item.coordinate.longitude,
                   }}
-                  radius={item.distance}
+                  radius={item.distance }
                   fillColor="rgba(0, 0, 255, 0.05)"
                   strokeColor="rgba(100, 100, 100, 0.5)"
                   zIndex={2}

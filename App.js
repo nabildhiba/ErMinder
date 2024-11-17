@@ -217,9 +217,7 @@ const App = () => {
 
   useEffect(() => {
     if (isReady === true) {
-      console.log('000000000000000000000');
      finalCheck();
-     console.log("finito");
     }
 
   }, [isReady]);

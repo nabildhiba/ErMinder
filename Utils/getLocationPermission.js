@@ -1,5 +1,7 @@
 import {PermissionsAndroid, Platform,  Alert,AsyncStorage} from 'react-native';
 
+
+
 export const checkLocationPermissions30Plus = async () => {
   const backgroundLocationPermissionGranted = await PermissionsAndroid.check(
     PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
